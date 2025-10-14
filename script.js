@@ -39,11 +39,11 @@ createApp({
                 desc: "Improv games, voice projection, and short scenes. Build confidence and perform mini-skits." },
             { subject: "Science Experiments",location: "Colindale",     price: 95,  img: "images/science.jpg",
                 desc: "Safe, hands-on experiments: slime, rockets, circuits, and physics demos that explain how things work." },
-            { subject: "Art of Comics",      location: "Hendon",        price: 70,  img: "images/comics.jpg",
+            { subject: "Art of Comics",      location: "Hendon",        price: 70,  img: "images/comic.jpg",
                 desc: "Create characters, storyboards, and panels. Learn inking and speech bubbles for your own mini-comic." },
             { subject: "Nature Explorers",   location: "Brent Cross",   price: 55,  img: "images/nature.jpg",
                 desc: "Outdoor discovery: plant and bug ID, mini-terrariums, compass skills, and eco-friendly crafts." },
-            { subject: "Board Games Club",   location: "Colindale",     price: 50,  img: "images/games.jpg",
+            { subject: "Board Games Club",   location: "Colindale",     price: 50,  img: "images/boardgame.jpg",
                 desc: "Strategy and co-op games, friendly tournaments, and design a simple board game with friends." }
       ]
 
