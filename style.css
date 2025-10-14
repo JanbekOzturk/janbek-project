@@ -279,35 +279,40 @@ ul li {
 .modal-actions {
   display: flex;
   gap: 0.8rem;
-  justify-content: center; /* keeps both buttons centered nicely */
+  justify-content: center;
+  align-items: center;
 }
 
-/* Book button large (main) */
-.book-btn.lg {
-  padding: 0.8rem 1.6rem;
+/* shared button sizing */
+.modal-actions button {
+  min-width: 130px;
+  height: 48px;
   font-size: 1rem;
-  border-radius: 10px;
-  min-width: 120px; /* makes both buttons same width baseline */
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
 }
 
-/* Close (ghost) button same size as Book */
+/* book button */
+.book-btn.lg {
+  background-color: var(--matcha-green);
+  color: white;
+  border: none;
+}
+
+/* ghost close button */
 .ghost-btn {
   background: transparent;
   border: 2px solid var(--matcha-green);
   color: var(--dark-green);
-  padding: 0.8rem 1.6rem;
-  font-size: 1rem;
-  border-radius: 10px;
-  font-weight: 500;
-  cursor: pointer;
-  min-width: 120px; /* equal width */
-  transition: all 0.25s ease-in-out;
 }
 
 .ghost-btn:hover {
   background: var(--matcha-green);
   color: white;
 }
+
 
 .ghost-btn:hover { background: #fff; }
 
