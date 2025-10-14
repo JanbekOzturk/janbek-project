@@ -1,18 +1,18 @@
 /* ============================
-   MATCHA-LATTE COLORS BABY ITS 2025 !!
+   MATCHA-LATTE THEME (2025)
    ============================ */
 
 /* base colors */
 :root {
-  --matcha-green: #8BA888;     /* main soft green */
-  --dark-green: #44624A;       /* deeper accent */
-  --sage: #C0CFB2;             /* pale background tint */
-  --cream: #F1EBE1;            /* off-white card background */
-  --text-dark: #333333;        /* readable text */
-  --white: #ffffff;
+  --matcha-green: #8BA888;   /* main soft green */
+  --dark-green:   #44624A;   /* deeper accent */
+  --sage:         #C0CFB2;   /* pale background */
+  --cream:        #F1EBE1;   /* card background */
+  --text-dark:    #333333;   /* readable text */
+  --white:        #ffffff;
 }
 
-/* overall page style */
+/* page */
 body {
   font-family: "Poppins", "Segoe UI", Arial, sans-serif;
   background-color: var(--sage);
@@ -22,15 +22,14 @@ body {
   min-height: 100vh;
 }
 
-/* main heading */
 h1 {
   text-align: center;
   color: var(--dark-green);
   font-weight: 600;
-  margin-bottom: 2rem;
+  margin: 0 0 2rem;
 }
 
-/* lesson grid layout */
+/* ---------- grid of lessons ---------- */
 ul {
   list-style: none;
   display: grid;
@@ -41,109 +40,92 @@ ul {
   max-width: 1000px;
 }
 
-/* lesson cards */
-li {
+/* card */
+ul li {
   background-color: var(--cream);
+  border: 2px solid transparent;
   border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.25s ease-in-out;
-  border: 2px solid transparent;
-}
-
-/* hover effect */
-li:hover {
-  transform: translateY(-5px);
-  border-color: var(--matcha-green);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-}
-
-/* subject name styling */
-li strong {
-  display: block;
-  color: var(--dark-green);
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-}
-
-/* price highlight */
-li span {
-  display: inline-block;
-  margin-top: 0.25rem;
-  font-weight: bold;
-  color: var(--matcha-green);
-}
-
-/* subtle card hover glow */
-li:hover span {
-  color: var(--dark-green);
-}
-
-/* small responsive tweak */
-@media (max-width: 600px) {
-  body {
-    padding: 1rem;
-  }
-  ul {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* book button styling */
-.book-btn {
-  display: inline-block;
-  margin-top: 1rem;
-  background-color: var(--matcha-green);
-  border: none;
-  color: white;
-  padding: 0.7rem 1.4rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease-in-out;
-  align-self: center;
-}
-
-/* card layout fix to place button at bottom */
-li {
-  background-color: var(--cream);
-  border-radius: 12px;
-  padding: 1.5rem;
-  text-align: center;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.25s ease-in-out;
-  border: 2px solid transparent;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 330px;          /* keep rows even */
+  cursor: pointer;
 }
 
-/* hover effects */
-.book-btn:hover {
-  background-color: var(--dark-green);
-  transform: translateY(-2px);
+ul li:hover {
+  transform: translateY(-5px);
+  border-color: var(--matcha-green);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* hero section spacing */
+ul li.selected {
+  border-color: var(--dark-green);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  transform: translateY(-6px);
+}
+
+/* card text */
+ul li strong {
+  display: block;
+  color: var(--dark-green);
+  font-size: 1.2rem;
+  margin-bottom: .5rem;
+}
+
+ul li span {
+  display: inline-block;
+  margin-top: .25rem;
+  font-weight: 700;
+  color: var(--matcha-green);
+}
+
+ul li:hover span { color: var(--dark-green); }
+
+/* uniform card images */
+.lesson-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: .8rem;
+  display: block;
+  background: #f3f3f3;
+}
+
+/* book button on the card */
+.book-btn {
+  margin-top: 1rem;
+  background-color: var(--matcha-green);
+  color: #fff;
+  border: none;
+  padding: .7rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all .25s ease-in-out;
+  align-self: center;
+}
+.book-btn:hover { background-color: var(--dark-green); transform: translateY(-2px); }
+
+/* ---------- hero / carousel ---------- */
 .hero {
   max-width: 1100px;
-  margin: 0 auto 1.5rem auto;
+  margin: 0 auto 1.5rem;
   padding: 0 1rem;
 }
 
-/* carousel frame */
 .carousel {
   position: relative;
-  height: 340px;            /* desktop height */
+  height: 340px;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0,0,0,.12);
-  background: var(--sage);  /* fallback color while images load */
+  background: var(--sage);
 }
 
-/* the carousel slide */
 .slide {
   width: 100%;
   height: 100%;
@@ -153,29 +135,13 @@ li {
   transition: opacity 1s ease-in-out;
 }
 
-/* slide animations :> */
-.slide-leave-active,
-.slide-enter-active {
-  transition: opacity 1s ease;
-}
-.slide-leave-from,
-.slide-enter-to {
-  opacity: 1;
-}
-.slide-enter-from,
-.slide-leave-to {
-  opacity: 0;
-}
-
-
-/* nav arrows */
+/* dots + arrows */
 .nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   border: none;
-  width: 42px;
-  height: 42px;
+  width: 42px; height: 42px;
   border-radius: 50%;
   background: rgba(255,255,255,.85);
   color: var(--dark-green);
@@ -185,128 +151,100 @@ li {
   transition: background .2s;
 }
 .nav:hover { background: #fff; }
-.prev { left: 12px; }
-.next { right: 12px; }
+.prev { left: 12px; } .next { right: 12px; }
 
-/* dots at the bottom */
 .dots {
   position: absolute;
-  left: 50%;
-  bottom: 12px;
+  left: 50%; bottom: 12px;
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
 }
 .dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 0;
+  width: 10px; height: 10px; border-radius: 50%;
   background: rgba(255,255,255,.7);
-  cursor: pointer;
+  border: 0; cursor: pointer;
 }
 .dot.active { background: var(--matcha-green); }
 
-/* smaller height on phones */
-@media (max-width: 640px) {
-  .carousel { height: 220px; }
-}
-
-/* make cards feel clickable */
-li { cursor: pointer; }
-
-/* selected card highlight */
-li.selected {
-  border-color: var(--dark-green);
-  box-shadow: 0 8px 18px rgba(0,0,0,.18);
-  transform: translateY(-6px);
-}
-
-/* modal backdrop + card */
+/* ---------- modal ---------- */
 .modal-backdrop {
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   background: rgba(0,0,0,.4);
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-  z-index: 50;
+  display: grid; place-items: center;
+  padding: 1rem; z-index: 50;
 }
 
 .modal-card {
   background: var(--cream);
   border-radius: 16px;
   overflow: hidden;
-  max-width: 820px;
-  width: 100%;
+  max-width: 820px; width: 100%;
   box-shadow: 0 20px 60px rgba(0,0,0,.35);
   display: grid;
   grid-template-columns: 1.1fr 1fr;
 }
 
-/* make all main-page images uniform in size */
-.lesson-img {
-  width: 100%;
-  height: 200px;              /* keeps all lesson pictures equal */
-  object-fit: cover;          /* crops edges instead of stretching */
-  border-radius: 10px;
-  margin-bottom: 0.8rem;
-  display: block;
-  background-color: #f3f3f3;  /* light fallback while loading */
-}
-
-/* fix card heights across grid */
-ul li {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 330px;  /* adjust if needed */
-}
-
-
-/* modal image + content */
 .modal-img {
-  width: 100%;
-  height: 100%;
-  max-height: 520px;
-  object-fit: cover;
+  width: 100%; height: 100%;
+  max-height: 520px; object-fit: cover;
 }
+
 .modal-body { padding: 1.25rem 1.25rem 1.5rem; }
 .modal-body h2 { margin: 0 0 .25rem; color: var(--dark-green); }
 .muted { color: #667085; margin: 0 0 .5rem; }
 .price { font-weight: 700; color: var(--matcha-green); margin: 0 0 1rem; }
+.desc { line-height: 1.55; margin: 0 0 1rem; }
 
-/* Simple alignment fix for modal buttons */
+/* modal actions: simple, identical sizing */
 .modal-actions {
   display: flex;
   justify-content: center;
-  gap: 0.8rem;
   align-items: center;
+  gap: .8rem;
 }
 
-/* Make both buttons share the same height visually */
-.modal-actions .book-btn.lg,
-.modal-actions .ghost-btn {
+.modal-actions button {
   height: 48px;
-  padding: 0 1.5rem;
-  border-radius: 10px;
+  min-width: 140px;
+  padding: 0 1.5rem;          /* height controls vertical size */
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 600;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;     /* include border in the 48px */
+  transition: all .25s ease-in-out;
 }
 
-.ghost-btn:hover { background: #fff; }
+/* filled */
+.book-btn.lg {
+  background: var(--matcha-green);
+  color: #fff;
+  border: 2px solid var(--matcha-green);
+}
 
-/* responsive modal */
+/* outlined */
+.ghost-btn {
+  background: transparent;
+  color: var(--dark-green);
+  border: 2px solid var(--matcha-green);
+}
+.ghost-btn:hover,
+.book-btn.lg:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+
+/* ---------- responsive tweaks ---------- */
+@media (max-width: 640px) { .carousel { height: 220px; } }
 @media (max-width: 760px) {
   .modal-card { grid-template-columns: 1fr; }
   .modal-img { max-height: 280px; }
 }
-
-/* description paragraph inside modal */
-.desc {
-  line-height: 1.55;
-  margin: 0 0 1rem;
+@media (max-width: 600px) {
+  body { padding: 1rem; }
+  ul   { grid-template-columns: 1fr; }
 }
-
