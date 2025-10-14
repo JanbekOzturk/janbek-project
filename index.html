@@ -15,18 +15,24 @@
 <body>
   <div id="app">
 
-    <!-- hero banner with 3-picture carousel -->
+    <!-- hero banner; if something is selected, show its image -->
     <section class="hero">
-      <div class="carousel" @mouseenter="pause" @mouseleave="play">
-        <button class="nav prev" @click="prev">‹</button>
+      <div class="carousel" @mouseenter="pause" @mouseleave="play" >
+        <button class="nav prev" v-if="!selectedLesson" @click="prev">‹</button>
 
-        <!-- current slide -->
-        <img :src="banners[currentBanner]" alt="banner image" class="slide"/>
+        <!-- force re-render on change -->
+        <img
+          :src="currentHeroSrc"
+          :key="currentHeroKey"
+          :alt="selectedLesson ? selectedLesson.subject : 'banner image'"
+          class="slide"
+          draggable="false"
+        />
 
-        <button class="nav next" @click="next">›</button>
+        <button class="nav next" v-if="!selectedLesson" @click="next">›</button>
 
-        <!-- dots to jump to a slide -->
-        <div class="dots">
+        <!-- dots hidden while a lesson is selected -->
+        <div class="dots" v-if="!selectedLesson">
           <button
             v-for="(img, i) in banners"
             :key="i"
@@ -40,19 +46,43 @@
 
     <h1>After School Activities</h1>
 
+    <!-- activity grid; clicking selects a card -->
     <ul>
-      <li v-for="lesson in lessons" :key="lesson.subject">
+      <li
+        v-for="lesson in lessons"
+        :key="lesson.subject"
+        @click="select(lesson)"
+        :class="{ selected: selectedLesson && selectedLesson.subject === lesson.subject }"
+      >
+        <img :src="lesson.img" :alt="lesson.subject" class="lesson-img" />
         <strong>{{ lesson.subject }}</strong>
         <div>{{ lesson.location }}</div>
         <span>£{{ lesson.price }}</span>
-        <button class="book-btn">Book</button>
+        <button class="book-btn" @click.stop="book(lesson)">Book</button>
       </li>
     </ul>
+
+    <!-- simple popup shown when a lesson is selected -->
+    <div class="modal-backdrop" v-if="selectedLesson" @click.self="clearSelection">
+      <div class="modal-card" role="dialog" aria-modal="true">
+        <img :src="selectedLesson.img" :alt="selectedLesson.subject" class="modal-img" />
+        <div class="modal-body">
+          <h2>{{ selectedLesson.subject }}</h2>
+          <p class="muted">{{ selectedLesson.location }}</p>
+          <p class="price">£{{ selectedLesson.price }}</p>
+          <div class="modal-actions">
+            <button class="book-btn lg" @click="book(selectedLesson)">Book</button>
+            <button class="ghost-btn" @click="clearSelection">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- prod build of Vue + cache-bust my files -->
+  <!-- prod build of Vue + cache-bust -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-  <script src="script.js?v=4"></script>
+  <script src="script.js?v=5"></script>
 </body>
 
 </html>

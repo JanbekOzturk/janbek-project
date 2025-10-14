@@ -4,59 +4,92 @@ const { createApp } = Vue;
 createApp({
   data() {
     return {
-      // carousel images for the banners
+      // top-of-page carousel banners
       banners: [
-  'images/banner1.jpg',
-  'images/banner2.jpg',
-  'images/banner3.jpg'
-    ],
-
+        'images/banner1.jpg',
+        'images/banner2.jpg',
+        'images/banner3.jpg'
+      ],
       currentBanner: 0,
-      rotator: null, // interval id
+      rotator: null, // autoplay interval id
+
+      // selected lesson state (null when nothing selected)
+      selectedLesson: null,
 
       // page title
       title: "After School Activities",
 
-      // activities available for kids aged 8–14
+      // activities with thumbnail images
       lessons: [
-        { subject: "Lego Robotics",      location: "Hendon",       price: 90 },
-        { subject: "Creative Art Club",   location: "Colindale",    price: 70 },
-        { subject: "Junior Coding",       location: "Brent Cross",  price: 100 },
-        { subject: "Football Training",   location: "Golders Green",price: 60 },
-        { subject: "Music Band Practice", location: "Hendon",       price: 80 },
-        { subject: "Dance & Movement",    location: "Colindale",    price: 75 },
-        { subject: "Cooking for Kids",    location: "Brent Cross",  price: 65 },
-        { subject: "Drama & Acting",      location: "Hendon",       price: 85 },
-        { subject: "Science Experiments", location: "Colindale",    price: 95 },
-        { subject: "Art of Comics",       location: "Hendon",       price: 70 },
-        { subject: "Nature Explorers",    location: "Brent Cross",  price: 55 },
-        { subject: "Board Games Club",    location: "Colindale",    price: 50 }
+        { subject: "Lego Robotics",      location: "Hendon",        price: 90,  img: "images/lego.jpg" },
+        { subject: "Creative Art Club",  location: "Colindale",     price: 70,  img: "images/art.jpg" },
+        { subject: "Junior Coding",      location: "Brent Cross",   price: 100, img: "images/coding.jpg" },
+        { subject: "Football Training",  location: "Golders Green", price: 60,  img: "images/football.jpg" },
+        { subject: "Music Band Practice",location: "Hendon",        price: 80,  img: "images/music.jpg" },
+        { subject: "Dance & Movement",   location: "Colindale",     price: 75,  img: "images/dance.jpg" },
+        { subject: "Cooking for Kids",   location: "Brent Cross",   price: 65,  img: "images/cooking.jpg" },
+        { subject: "Drama & Acting",     location: "Hendon",        price: 85,  img: "images/drama.jpg" },
+        { subject: "Science Experiments",location: "Colindale",     price: 95,  img: "images/science.jpg" },
+        { subject: "Art of Comics",      location: "Hendon",        price: 70,  img: "images/comic.jpg" },
+        { subject: "Nature Explorers",   location: "Brent Cross",   price: 55,  img: "images/nature.jpg" },
+        { subject: "Board Games Club",   location: "Colindale",     price: 50,  img: "images/boardgame.jpg" }
       ]
     };
   },
+
+  computed: {
+    // hero shows selected lesson image if any, else current rotating banner
+    currentHeroSrc() {
+      return this.selectedLesson ? this.selectedLesson.img
+                                 : this.banners[this.currentBanner];
+    },
+    // change key to force <img> to re-render when source changes
+    currentHeroKey() {
+      return this.selectedLesson
+        ? `sel-${this.selectedLesson.subject}`
+        : `ban-${this.currentBanner}`;
+    }
+  },
+
   methods: {
-    // go to next/prev slide
+    // card selection handlers
+    select(lesson) {
+      this.selectedLesson = lesson; // pick a card
+      this.pause();                 // pause rotation while focused
+      // optional: scroll hero into view on mobile
+      // document.querySelector('.hero')?.scrollIntoView({ behavior: 'smooth' });
+    },
+    clearSelection() {
+      this.selectedLesson = null; // unselect
+      this.play();                // resume rotation
+    },
+
+    // pretend booking (we’ll wire a cart later)
+    book(lesson) {
+      alert(`Booked: ${lesson.subject} in ${lesson.location} — £${lesson.price}`);
+    },
+
+    // carousel controls
     next() { this.currentBanner = (this.currentBanner + 1) % this.banners.length; },
     prev() { this.currentBanner = (this.currentBanner - 1 + this.banners.length) % this.banners.length; },
     go(i)  { this.currentBanner = i; },
 
-    // autoplay helpers
-    play() {
-      // avoid multiple intervals
-      if (this.rotator) return;
-      this.rotator = setInterval(() => this.next(), 4000); // 4s per slide
-    },
-    pause() {
-      clearInterval(this.rotator);
-      this.rotator = null;
+    // autoplay
+    play() { if (!this.selectedLesson && !this.rotator) this.rotator = setInterval(() => this.next(), 4000); },
+    pause() { clearInterval(this.rotator); this.rotator = null; },
+
+    // close on ESC for accessibility
+    onKey(e) {
+      if (e.key === 'Escape' && this.selectedLesson) this.clearSelection();
     }
   },
+
   mounted() {
-    // start the auto-rotate when page loads
     this.play();
+    window.addEventListener('keydown', this.onKey);
   },
   beforeUnmount() {
-    // clean up interval (good habit)
     this.pause();
+    window.removeEventListener('keydown', this.onKey);
   }
 }).mount("#app"); // mounting the Vue app to the #app div
