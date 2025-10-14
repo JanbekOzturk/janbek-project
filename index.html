@@ -13,24 +13,46 @@
 </head>
 
 <body>
-  <!-- main Vue app container -->
   <div id="app">
-    <h1>{{ title }}</h1>
+
+    <!-- hero banner with 3-picture carousel -->
+    <section class="hero">
+      <div class="carousel" @mouseenter="pause" @mouseleave="play">
+        <button class="nav prev" @click="prev">‹</button>
+
+        <!-- current slide -->
+        <img :src="banners[currentBanner]" alt="banner image" class="slide"/>
+
+        <button class="nav next" @click="next">›</button>
+
+        <!-- dots to jump to a slide -->
+        <div class="dots">
+          <button
+            v-for="(img, i) in banners"
+            :key="i"
+            class="dot"
+            :class="{ active: i === currentBanner }"
+            @click="go(i)">
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <h1>After School Activities</h1>
 
     <ul>
-        <li v-for="lesson in lessons" :key="lesson.subject">
-            <strong>{{ lesson.subject }}</strong>
-            <div>{{ lesson.location }}</div>
-            <span>£{{ lesson.price }}</span>
-            <!-- booking button -->
-            <button class="book-btn">Book</button>
-        </li>
+      <li v-for="lesson in lessons" :key="lesson.subject">
+        <strong>{{ lesson.subject }}</strong>
+        <div>{{ lesson.location }}</div>
+        <span>£{{ lesson.price }}</span>
+        <button class="book-btn">Book</button>
+      </li>
     </ul>
-
-
   </div>
 
-  <!-- my Vue script file -->
-  <script src="script.js"></script>
+  <!-- prod build of Vue + cache-bust my files -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="script.js?v=4"></script>
 </body>
+
 </html>
