@@ -204,20 +204,23 @@ ul li:hover span { color: var(--dark-green); }
   gap: .8rem;
 }
 
-.modal-actions button {
+/* finally it aligns perfectly */
+.modal-actions .book-btn.lg,
+.modal-actions .ghost-btn {
+  margin: 0;              /* <-- reset the original margin of Global,book button*/
   height: 48px;
   min-width: 140px;
-  padding: 0 1.5rem;          /* height controls vertical size */
+  padding: 0 1.5rem;
   border-radius: 12px;
-  font-size: 1rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
-  box-sizing: border-box;     /* include border in the 48px */
-  transition: all .25s ease-in-out;
+  box-sizing: border-box;
+  border-width: 2px;      /* both use same border thickness */
 }
+
 
 /* filled */
 .book-btn.lg {
