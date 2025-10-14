@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Janbek Project - After School Lessons</title>
+
+  <!-- my stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- using Vue 3 from the CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <!-- main Vue app container -->
+  <div id="app">
+    <h1>{{ title }}</h1>
+
+    <ul>
+        <li v-for="lesson in lessons" :key="lesson.subject">
+            {{ lesson.subject }} — {{ lesson.location }} — 
+            <span>£{{ lesson.price }}</span>
+        </li>
+    </ul>
+  </div>
+
+  <!-- my Vue script file -->
+  <script src="script.js"></script>
+</body>
+</html>
