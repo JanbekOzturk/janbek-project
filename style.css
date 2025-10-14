@@ -292,16 +292,21 @@ ul li {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease-in-out;
+  line-height: 1;              /* fixes vertical misalignment */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;      /* ensures border doesn’t expand height */
 }
 
 /* book button */
 .book-btn.lg {
   background-color: var(--matcha-green);
   color: white;
-  border: none;
+  border: 2px solid var(--matcha-green); /* equal border thickness for both */
 }
 
-/* ghost close button */
+/* ghost (close) button */
 .ghost-btn {
   background: transparent;
   border: 2px solid var(--matcha-green);
@@ -312,6 +317,7 @@ ul li {
   background: var(--matcha-green);
   color: white;
 }
+
 
 
 .ghost-btn:hover { background: #fff; }
