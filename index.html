@@ -15,71 +15,124 @@
 <body>
   <div id="app">
 
-    <!-- hero banner; if something is selected, show its image -->
-    <section class="hero">
-      <div class="carousel" @mouseenter="pause" @mouseleave="play" >
-        <button class="nav prev" v-if="!selectedLesson" @click="prev">‹</button>
+  <!-- top bar with cart toggle -->
+  <header class="topbar">
+    <div class="brand">After School Activities</div>
+    <button class="cart-toggle" @click="showCart = !showCart">
+      🛒 Cart <span v-if="cartCount">({{ cartCount }})</span>
+    </button>
+  </header>
 
-        <!-- force re-render on change -->
-        <img
-          :src="currentHeroSrc"
-          :key="currentHeroKey"
-          :alt="selectedLesson ? selectedLesson.subject : 'banner image'"
-          class="slide"
-          draggable="false"
-        />
-
-        <button class="nav next" v-if="!selectedLesson" @click="next">›</button>
-
-        <!-- dots hidden while a lesson is selected -->
-        <div class="dots" v-if="!selectedLesson">
-          <button
-            v-for="(img, i) in banners"
-            :key="i"
-            class="dot"
-            :class="{ active: i === currentBanner }"
-            @click="go(i)">
-          </button>
-        </div>
+  <!-- hero -->
+  <section class="hero">
+    <div class="carousel" @mouseenter="pause" @mouseleave="play">
+      <button class="nav prev" v-if="!selectedLesson" @click="prev">‹</button>
+      <img
+        :src="currentHeroSrc"
+        :key="currentHeroKey"
+        :alt="selectedLesson ? selectedLesson.subject : 'banner image'"
+        class="slide"
+        draggable="false"
+      />
+      <button class="nav next" v-if="!selectedLesson" @click="next">›</button>
+      <div class="dots" v-if="!selectedLesson">
+        <button v-for="(img, i) in banners" :key="i" class="dot"
+                :class="{ active: i === currentBanner }" @click="go(i)"></button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <h1>After School Activities</h1>
-
-    <!-- activity grid; clicking lessons selects a card -->
+  <!-- grid view -->
+  <section v-if="!showCart">
+    <h1>Browse & Book</h1>
     <ul>
       <li
         v-for="lesson in lessons"
-        :key="lesson.subject"
+        :key="lesson.id"
         @click="select(lesson)"
-        :class="{ selected: selectedLesson && selectedLesson.subject === lesson.subject }"
+        :class="{ selected: selectedLesson && selectedLesson.id === lesson.id }"
       >
         <img :src="lesson.img" :alt="lesson.subject" class="lesson-img" />
         <strong>{{ lesson.subject }}</strong>
         <div>{{ lesson.location }}</div>
         <span>£{{ lesson.price }}</span>
-        <button class="book-btn" @click.stop="book(lesson)">Book</button>
+        <small class="spaces">Spaces left: {{ lesson.spaces }}</small>
+        <button
+          class="book-btn"
+          @click.stop="book(lesson)"
+          :disabled="lesson.spaces === 0"
+        >
+          {{ lesson.spaces === 0 ? 'Full' : 'Book' }}
+        </button>
       </li>
     </ul>
+  </section>
 
-    <!-- simple "modal" popup shown when a lesson is selected, and its descriptions -->
-    <div class="modal-backdrop" v-if="selectedLesson" @click.self="clearSelection">
-      <div class="modal-card" role="dialog" aria-modal="true">
-        <img :src="selectedLesson.img" :alt="selectedLesson.subject" class="modal-img" />
-        <div class="modal-body">
-          <h2>{{ selectedLesson.subject }}</h2>
-          <p class="muted">{{ selectedLesson.location }}</p>
-          <p class="price">£{{ selectedLesson.price }}</p>
-          <p class="desc">{{ selectedLesson.desc }}</p>
-          <div class="modal-actions">
-            <button class="book-btn lg" @click="book(selectedLesson)">Book</button>
-            <button class="ghost-btn" @click="clearSelection">Close</button>
-          </div>
+  <!-- cart view -->
+  <section v-else class="cart-wrap">
+    <h1>My Cart</h1>
+
+    <div v-if="cart.length === 0" class="empty">
+      Cart is empty. Go add some activities!
+    </div>
+
+    <div v-else class="cart">
+      <div class="cart-row cart-head">
+        <div>Activity</div>
+        <div>Qty</div>
+        <div>Price</div>
+        <div>Total</div>
+        <div></div>
+      </div>
+
+      <div class="cart-row" v-for="item in cart" :key="item.id">
+        <div>{{ item.subject }}</div>
+        <div class="qty">
+          <button @click="decrease(item)">−</button>
+          <span>{{ item.qty }}</span>
+          <button @click="increase(item)" :disabled="getLessonById(item.id)?.spaces === 0">＋</button>
+        </div>
+        <div>£{{ item.price }}</div>
+        <div>£{{ item.price * item.qty }}</div>
+        <div><button class="remove" @click="remove(item)">Remove</button></div>
+      </div>
+
+      <div class="cart-total">Grand total: <strong>£{{ grandTotal }}</strong></div>
+
+      <!-- checkout form placeholder (we’ll wire validation next) -->
+      <form class="checkout" @submit.prevent="checkout">
+        <input type="text" v-model="customer.name" placeholder="Your name" />
+        <input type="tel" v-model="customer.phone" placeholder="Phone number" />
+        <button class="book-btn lg" :disabled="cart.length===0">Checkout</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- modal -->
+  <div class="modal-backdrop" v-if="selectedLesson" @click.self="clearSelection">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <img :src="selectedLesson.img" :alt="selectedLesson.subject" class="modal-img" />
+      <div class="modal-body">
+        <h2>{{ selectedLesson.subject }}</h2>
+        <p class="muted">{{ selectedLesson.location }}</p>
+        <p class="price">£{{ selectedLesson.price }}</p>
+        <p class="desc">{{ selectedLesson.desc }}</p>
+        <div class="modal-actions">
+          <button class="book-btn lg" @click="book(selectedLesson)" :disabled="selectedLesson.spaces===0">
+            {{ selectedLesson.spaces===0 ? 'Full' : 'Book' }}
+          </button>
+          <button class="ghost-btn" @click="clearSelection">Close</button>
         </div>
       </div>
     </div>
-
   </div>
+
+</div>
+
+<!-- prod Vue + cache-bust -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="script.js?v=6"></script>
+
 
   <!-- VUE3-->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>

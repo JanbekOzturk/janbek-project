@@ -251,3 +251,45 @@ ul li:hover span { color: var(--dark-green); }
   body { padding: 1rem; }
   ul   { grid-template-columns: 1fr; }
 }
+
+/* top bar with cart button */
+.topbar{
+  max-width:1100px; margin:0 auto 1rem; padding:0 1rem;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.brand{ font-weight:700; color:var(--dark-green); }
+.cart-toggle{
+  background: var(--matcha-green); color:#fff; border:none;
+  padding:.55rem 1rem; border-radius:10px; font-weight:600; cursor:pointer;
+}
+.cart-toggle:hover{ background: var(--dark-green); }
+
+/* spaces text */
+.spaces{ display:block; margin-top:.35rem; color:#667085; }
+
+/* disabled book button look */
+.book-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+/* cart table-ish layout */
+.cart-wrap{ max-width:1000px; margin:0 auto; }
+.cart{ background:var(--cream); border-radius:12px; padding:1rem; box-shadow:0 3px 8px rgba(0,0,0,.08); }
+.cart-head{ font-weight:700; }
+.cart-row{
+  display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap:.75rem; align-items:center; padding:.5rem 0; border-bottom:1px solid rgba(0,0,0,.05);
+}
+.cart-row:last-child{ border-bottom:none; }
+.qty{ display:flex; align-items:center; gap:.5rem; }
+.qty button{
+  width:28px; height:28px; border-radius:8px; border:1px solid #cbd5d1; background:#fff; cursor:pointer;
+}
+.remove{ background:transparent; border:2px solid var(--matcha-green); color:var(--dark-green);
+  padding:.4rem .8rem; border-radius:10px; cursor:pointer; }
+.cart-total{ text-align:right; margin-top:1rem; font-size:1.1rem; }
+.empty{ text-align:center; color:#667085; }
+
+/* checkout mini form */
+.checkout{ display:flex; gap:.6rem; margin-top:1rem; flex-wrap:wrap; }
+.checkout input{
+  padding:.6rem .8rem; border-radius:10px; border:1px solid #cbd5d1; flex:1 1 220px;
+}
