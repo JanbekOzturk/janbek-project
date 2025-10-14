@@ -276,49 +276,25 @@ ul li {
 .muted { color: #667085; margin: 0 0 .5rem; }
 .price { font-weight: 700; color: var(--matcha-green); margin: 0 0 1rem; }
 
+/* Simple alignment fix for modal buttons */
 .modal-actions {
   display: flex;
-  gap: 0.8rem;
   justify-content: center;
+  gap: 0.8rem;
   align-items: center;
 }
 
-/* shared button sizing */
-.modal-actions button {
-  min-width: 130px;
+/* Make both buttons share the same height visually */
+.modal-actions .book-btn.lg,
+.modal-actions .ghost-btn {
   height: 48px;
-  font-size: 1rem;
-  border-radius: 12px;
+  padding: 0 1.5rem;
+  border-radius: 10px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease-in-out;
-  line-height: 1;              /* fixes vertical misalignment */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;      /* ensures border doesn’t expand height */
 }
-
-/* book button */
-.book-btn.lg {
-  background-color: var(--matcha-green);
-  color: white;
-  border: 2px solid var(--matcha-green); /* equal border thickness for both */
-}
-
-/* ghost (close) button */
-.ghost-btn {
-  background: transparent;
-  border: 2px solid var(--matcha-green);
-  color: var(--dark-green);
-}
-
-.ghost-btn:hover {
-  background: var(--matcha-green);
-  color: white;
-}
-
-
 
 .ghost-btn:hover { background: #fff; }
 
