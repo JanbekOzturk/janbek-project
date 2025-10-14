@@ -1,50 +1,92 @@
-/* general page styling */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 2rem;
-  background-color: #f4f6f9;
-  color: #333;
+/* ============================
+   MATCHA-LATTE COLORS BABY ITS 2025 !!
+   ============================ */
+
+/* base colors */
+:root {
+  --matcha-green: #8BA888;     /* main soft green */
+  --dark-green: #44624A;       /* deeper accent */
+  --sage: #C0CFB2;             /* pale background tint */
+  --cream: #F1EBE1;            /* off-white card background */
+  --text-dark: #333333;        /* readable text */
+  --white: #ffffff;
 }
 
-/* main title */
+/* overall page style */
+body {
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+  background-color: var(--sage);
+  color: var(--text-dark);
+  margin: 0;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* main heading */
 h1 {
-  color: #2c3e50;
   text-align: center;
+  color: var(--dark-green);
+  font-weight: 600;
   margin-bottom: 2rem;
 }
 
-/* grid layout for the activities */
+/* lesson grid layout */
 ul {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+  gap: 1.5rem;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
+  max-width: 1000px;
 }
 
-/* each activity card */
+/* lesson cards */
 li {
-  background-color: #fff;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  background-color: var(--cream);
+  border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
-  font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease-in-out;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease-in-out;
+  border: 2px solid transparent;
 }
 
-/* hover effect for interactivity */
+/* hover effect */
 li:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  border-color: var(--matcha-green);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  border-color: #2c3e50;
 }
 
-/* prices in bold for emphasis */
+/* subject name styling */
+li strong {
+  display: block;
+  color: var(--dark-green);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* price highlight */
 li span {
+  display: inline-block;
+  margin-top: 0.25rem;
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--matcha-green);
+}
+
+/* subtle card hover glow */
+li:hover span {
+  color: var(--dark-green);
+}
+
+/* small responsive tweak */
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+  ul {
+    grid-template-columns: 1fr;
+  }
 }

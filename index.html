@@ -19,10 +19,12 @@
 
     <ul>
         <li v-for="lesson in lessons" :key="lesson.subject">
-            {{ lesson.subject }} — {{ lesson.location }} — 
+            <strong>{{ lesson.subject }}</strong>
+                <div>{{ lesson.location }}</div>
             <span>£{{ lesson.price }}</span>
         </li>
     </ul>
+
   </div>
 
   <!-- my Vue script file -->
