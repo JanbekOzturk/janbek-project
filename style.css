@@ -252,17 +252,62 @@ ul li:hover span { color: var(--dark-green); }
   ul   { grid-template-columns: 1fr; }
 }
 
-/* top bar with cart button */
-.topbar{
-  max-width:1100px; margin:0 auto 1rem; padding:0 1rem;
-  display:flex; justify-content:space-between; align-items:center;
+/* soft cream header that matches the theme */
+:root {
+  --header-cream: #F6F2E8; /* gentle cream for the header */
 }
-.brand{ font-weight:700; color:var(--dark-green); }
+
+.topbar{
+  max-width:1100px;
+  margin:0 auto 1rem;
+  padding:.6rem 1rem;
+  background: var(--header-cream);
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* brand is a subtle clickable text (no button chrome) */
+.brand{
+  background:transparent;
+  border:none;
+  padding:0;
+  color:var(--dark-green);
+  font-weight:700;
+  font-size:1.05rem;
+  cursor:pointer;
+}
+
+.topbar-actions{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+}
+
+/* red X that appears only when cart is open */
+.close-cart{
+  width:32px; height:32px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%;
+  background:#fff;
+  color:#c0392b;
+  border:2px solid #c0392b;
+  font-weight:800;
+  line-height:1;
+  cursor:pointer;
+}
+.close-cart:hover{ background:#ffeaea; }
+
+/* existing cart button kept as-is */
 .cart-toggle{
   background: var(--matcha-green); color:#fff; border:none;
   padding:.55rem 1rem; border-radius:10px; font-weight:600; cursor:pointer;
 }
 .cart-toggle:hover{ background: var(--dark-green); }
+
 
 /* spaces text */
 .spaces{ display:block; margin-top:.35rem; color:#667085; }
@@ -293,3 +338,4 @@ ul li:hover span { color: var(--dark-green); }
 .checkout input{
   padding:.6rem .8rem; border-radius:10px; border:1px solid #cbd5d1; flex:1 1 220px;
 }
+

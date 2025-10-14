@@ -17,11 +17,25 @@
 
   <!-- top bar with cart toggle -->
   <header class="topbar">
-    <div class="brand">After School Activities</div>
+  <!-- the name works like a “home” button -->
+  <button class="brand" @click="goHome">After School Activities</button>
+
+  <div class="topbar-actions">
+    <!-- red X shows only when cart is open -->
+    <button
+      v-if="showCart"
+      class="close-cart"
+      @click="showCart = false"
+      aria-label="Close cart"
+      title="Close Cart"
+    >✕</button>
+
     <button class="cart-toggle" @click="showCart = !showCart">
       🛒 Cart <span v-if="cartCount">({{ cartCount }})</span>
     </button>
-  </header>
+  </div>
+</header>
+
 
   <!-- hero -->
   <section class="hero">

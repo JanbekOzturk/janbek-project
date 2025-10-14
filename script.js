@@ -166,6 +166,14 @@ createApp({
       this.showCart = false;
     },
 
+    goHome() {
+        // go back to lessons, close any modal, and scroll to top
+        this.showCart = false;
+        this.clearSelection();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+
     // close modal on Esc
     onKey(e) {
       if (e.key === 'Escape' && this.selectedLesson) this.clearSelection();
