@@ -244,6 +244,26 @@ li.selected {
   grid-template-columns: 1.1fr 1fr;
 }
 
+/* make all main-page images uniform in size */
+.lesson-img {
+  width: 100%;
+  height: 200px;              /* keeps all lesson pictures equal */
+  object-fit: cover;          /* crops edges instead of stretching */
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+  display: block;
+  background-color: #f3f3f3;  /* light fallback while loading */
+}
+
+/* fix card heights across grid */
+ul li {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 330px;  /* adjust if needed */
+}
+
+
 /* modal image + content */
 .modal-img {
   width: 100%;
