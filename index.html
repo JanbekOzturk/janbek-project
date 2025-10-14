@@ -20,10 +20,13 @@
     <ul>
         <li v-for="lesson in lessons" :key="lesson.subject">
             <strong>{{ lesson.subject }}</strong>
-                <div>{{ lesson.location }}</div>
+            <div>{{ lesson.location }}</div>
             <span>£{{ lesson.price }}</span>
+            <!-- booking button -->
+            <button class="book-btn">Book</button>
         </li>
     </ul>
+
 
   </div>
 

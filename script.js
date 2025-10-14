@@ -7,7 +7,7 @@ createApp({
       // page title
       title: "After School Activities",
 
-      // activities available for kids aged 8–14
+      // activities available for kids aged 8–14 (12 total)
       lessons: [
         { subject: "Lego Robotics", location: "Hendon", price: 90 },
         { subject: "Creative Art Club", location: "Colindale", price: 70 },
@@ -18,7 +18,9 @@ createApp({
         { subject: "Cooking for Kids", location: "Brent Cross", price: 65 },
         { subject: "Drama & Acting", location: "Hendon", price: 85 },
         { subject: "Science Experiments", location: "Colindale", price: 95 },
-        { subject: "Art of Comics", location: "Hendon", price: 70 }
+        { subject: "Art of Comics", location: "Hendon", price: 70 },
+        { subject: "Nature Explorers", location: "Brent Cross", price: 55 },
+        { subject: "Board Games Club", location: "Colindale", price: 50 }
       ]
     };
   }

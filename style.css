@@ -90,3 +90,21 @@ li:hover span {
     grid-template-columns: 1fr;
   }
 }
+
+/* book button styling */
+.book-btn {
+  margin-top: 0.8rem;
+  background-color: var(--matcha-green);
+  border: none;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+}
+
+.book-btn:hover {
+  background-color: var(--dark-green);
+  transform: translateY(-2px);
+}
