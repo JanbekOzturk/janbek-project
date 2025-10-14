@@ -295,3 +295,10 @@ ul li {
   .modal-card { grid-template-columns: 1fr; }
   .modal-img { max-height: 280px; }
 }
+
+/* description paragraph inside modal */
+.desc {
+  line-height: 1.55;
+  margin: 0 0 1rem;
+}
+

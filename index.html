@@ -46,7 +46,7 @@
 
     <h1>After School Activities</h1>
 
-    <!-- activity grid; clicking selects a card -->
+    <!-- activity grid; clicking lessons selects a card -->
     <ul>
       <li
         v-for="lesson in lessons"
@@ -62,7 +62,7 @@
       </li>
     </ul>
 
-    <!-- simple popup shown when a lesson is selected -->
+    <!-- simple "modal" popup shown when a lesson is selected, and its descriptions -->
     <div class="modal-backdrop" v-if="selectedLesson" @click.self="clearSelection">
       <div class="modal-card" role="dialog" aria-modal="true">
         <img :src="selectedLesson.img" :alt="selectedLesson.subject" class="modal-img" />
@@ -70,6 +70,7 @@
           <h2>{{ selectedLesson.subject }}</h2>
           <p class="muted">{{ selectedLesson.location }}</p>
           <p class="price">£{{ selectedLesson.price }}</p>
+          <p class="desc">{{ selectedLesson.desc }}</p>
           <div class="modal-actions">
             <button class="book-btn lg" @click="book(selectedLesson)">Book</button>
             <button class="ghost-btn" @click="clearSelection">Close</button>
@@ -80,7 +81,7 @@
 
   </div>
 
-  <!-- prod build of Vue + cache-bust -->
+  <!-- VUE3-->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script src="script.js?v=5"></script>
 </body>
