@@ -4,19 +4,13 @@ const { createApp } = Vue;
 createApp({
   data() {
     return {
-      // hero images (I can switch these to local files later)
-      // note to self: to use local images, add /images/banner1.jpg etc to the repo
+      // carousel images for the banners
       banners: [
-        // local examples:
-        // 'images/banner1.jpg',
-        // 'images/banner2.jpg',
-        // 'images/banner3.jpg',
+  'images/banner1.jpg',
+  'images/banner2.jpg',
+  'images/banner3.jpg'
+    ],
 
-        // quick Unsplash placeholders (safe to start with)
-        'https://images.unsplash.com/photo-1520975922215-230dfea3b0e7?q=80&w=1600&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1600&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1512427691650-1f6a1f0b6dfd?q=80&w=1600&auto=format&fit=crop'
-      ],
       currentBanner: 0,
       rotator: null, // interval id
 
