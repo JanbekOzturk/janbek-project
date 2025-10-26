@@ -41,15 +41,16 @@
           <input
             id="search"
             v-model.trim="searchText"
+            @input="savePrefs"         <!-- ensure prefs persist as you type -->
             type="text"
             placeholder="Subject or location"
           />
-          <button v-if="searchText" class="ghost-btn small" @click="searchText = ''">Clear</button>
+          <button v-if="searchText" class="ghost-btn small" @click="clearSearch">Clear</button>
         </div>
 
         <div class="sort-bar toolbar-right">
           <label for="sort">Sort by:</label>
-          <select id="sort" v-model="selectedSort" @change="sortLessons">
+          <select id="sort" v-model="selectedSort" @change="onSortChange">
             <option value="default">Default</option>
             <option value="price">Price (Low → High)</option>
             <option value="availability">Availability (Most → Least)</option>
@@ -121,7 +122,7 @@ export default {
       cart: [],
       customer: { name: "", phone: "" },
 
-      // search + sort (PERSISTED)
+      // search + sort (persisted)
       searchText: "",
       selectedSort: 'default',
 
@@ -181,24 +182,29 @@ export default {
     }
   },
 
-  watch: {
-    // persist cart (deep watch)
-    cart: {
-      handler: function () {
-        localStorage.setItem('asa_cart', JSON.stringify(this.cart));
-      },
-      deep: true
-    },
-    // persist sort + search as the user changes them
-    selectedSort: function (v) { localStorage.setItem('asa_sort', v); },
-    searchText:  function (v) { localStorage.setItem('asa_search', v); }
-  },
-
   methods: {
-    // --- helpers for persistence ---
+    /* ---------- persistence helpers ---------- */
+    saveCart: function () {
+      try {
+        localStorage.setItem('asa_cart', JSON.stringify(this.cart));
+      } catch (e) {
+        console.warn('Could not save cart:', e);
+      }
+    },
+    savePrefs: function () {
+      try {
+        localStorage.setItem('asa_sort', this.selectedSort);
+        localStorage.setItem('asa_search', this.searchText);
+      } catch (e) {
+        console.warn('Could not save prefs:', e);
+      }
+    },
+    clearSearch: function () {
+      this.searchText = "";
+      this.savePrefs();
+    },
     applyCartToLessons: function () {
-      // Reset all spaces to 5 (original) then subtract cart quantities
-      // If you later load lessons from a backend, remove the reset.
+      // reset spaces to original (5) then subtract items in cart
       for (var i = 0; i < this.lessons.length; i++) this.lessons[i].spaces = 5;
       for (var c = 0; c < this.cart.length; c++) {
         var item = this.cart[c];
@@ -210,6 +216,7 @@ export default {
       }
     },
 
+    /* ---------- core helpers ---------- */
     getLessonById: function (id) {
       for (var i = 0; i < this.lessons.length; i++) if (this.lessons[i].id === id) return this.lessons[i];
       return null;
@@ -230,13 +237,16 @@ export default {
         this.lessons.sort(function (a, b) { return a.id - b.id; });
       }
     },
+    onSortChange: function () {
+      this.sortLessons();
+      this.savePrefs();
+    },
 
+    // cart / ui
     openCart: function () {
       if (this.cartCount == 0) { alert("Your cart is empty. Add some lessons first!"); return; }
       this.showCart = true;
     },
-
-    // selection / modal
     select: function (lesson) { this.selectedLesson = lesson; this.pause(); },
     clearSelection: function () { this.selectedLesson = null; this.play(); },
 
@@ -252,7 +262,7 @@ export default {
     },
     pause: function () { if (this.rotator != null) { clearInterval(this.rotator); this.rotator = null; } },
 
-    // cart
+    // cart mutations (now call saveCart() every time)
     book: function (lesson) {
       if (lesson.spaces === 0) return;
       var existing = -1;
@@ -260,23 +270,32 @@ export default {
       if (existing != -1) this.cart[existing].qty = this.cart[existing].qty + 1;
       else this.cart.push({ id: lesson.id, subject: lesson.subject, price: lesson.price, qty: 1 });
       lesson.spaces = lesson.spaces - 1;
+      this.saveCart();
     },
     increase: function (item) {
       var lesson = this.getLessonById(item.id);
-      if (lesson && lesson.spaces > 0) { item.qty = item.qty + 1; lesson.spaces = lesson.spaces - 1; }
+      if (lesson && lesson.spaces > 0) {
+        item.qty = item.qty + 1;
+        lesson.spaces = lesson.spaces - 1;
+        this.saveCart();
+      }
     },
     decrease: function (item) {
       var lesson = this.getLessonById(item.id);
       if (!lesson) return;
-      if (item.qty > 1) { item.qty = item.qty - 1; lesson.spaces = lesson.spaces + 1; }
-      else this.removeItem(item);
+      if (item.qty > 1) {
+        item.qty = item.qty - 1;
+        lesson.spaces = lesson.spaces + 1;
+        this.saveCart();
+      } else {
+        this.removeItem(item);
+      }
     },
     removeItem: function (item) {
       var lesson = this.getLessonById(item.id);
       if (lesson) lesson.spaces = lesson.spaces + item.qty;
-      var newCart = [];
-      for (var i = 0; i < this.cart.length; i++) if (this.cart[i].id != item.id) newCart.push(this.cart[i]);
-      this.cart = newCart;
+      this.cart = this.cart.filter(i => i.id != item.id);
+      this.saveCart();
     },
     checkout: function () {
       var nameValid = /^[A-Za-z\s]+$/.test(this.customer.name.trim());
@@ -284,28 +303,28 @@ export default {
       if (!nameValid || !phoneValid) { alert("Please enter a valid Name (letters) and Phone (numbers)."); return; }
       if (this.cart.length == 0) { alert("Your cart is empty."); return; }
       alert("Order submitted! Thank you.");
-      this.cart = []; this.customer = { name: "", phone: "" }; this.showCart = false;
+      this.cart = [];
+      this.customer = { name: "", phone: "" };
+      this.showCart = false;
+      this.saveCart();   // clear persisted cart too
     },
 
     goHome: function () { this.showCart = false; this.clearSelection(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
   },
 
   mounted: function () {
-    
-    // Load persisted state when we refresh for cart and sorting and search
+    // Load persisted state
     try {
-      var savedCart = localStorage.getItem('asa_cart');
-      var savedSort = localStorage.getItem('asa_sort');
+      var savedCart   = localStorage.getItem('asa_cart');
+      var savedSort   = localStorage.getItem('asa_sort');
       var savedSearch = localStorage.getItem('asa_search');
 
-      if (savedCart) this.cart = JSON.parse(savedCart);
-      if (savedSort) this.selectedSort = savedSort;
+      if (savedCart)   this.cart = JSON.parse(savedCart);
+      if (savedSort)   this.selectedSort = savedSort;
       if (savedSearch) this.searchText = savedSearch;
 
-      // Re-apply spaces based on saved cart
+      // Apply cart → lesson spaces, then ensure sort is applied
       if (this.cart.length > 0) this.applyCartToLessons();
-
-      // Ensure lessons are in the saved sort order
       this.sortLessons();
     } catch (e) {
       console.warn('Could not load saved state:', e);
