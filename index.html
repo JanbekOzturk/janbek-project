@@ -1,46 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>After School Activities</title>
 
-  <!-- Our page style -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Vue.js library (loads from the internet, no install needed) -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-
-  <!-- Loader that lets the browser open .vue files (no build tools needed) -->
-  <script src="https://unpkg.com/vue3-sfc-loader/dist/vue3-sfc-loader.js"></script>
+  <!-- Your global stylesheet -->
+  <link rel="stylesheet" href="./style.css" />
 </head>
-
 <body>
-  <!-- Vue app will appear inside this div -->
   <div id="app"></div>
 
-  <!-- Small and clear setup -->
-  <script type="module">
-    // Take Vue from the global variable provided by the script above
-    const { createApp } = Vue;
-    const { loadModule } = window['vue3-sfc-loader'];
+  <!-- Vue 3 (global build) -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
-    // Simple setup for loading our main App.vue file
-    loadModule('App.vue', {
+  <!-- SFC Loader: lets the browser load .vue files directly -->
+  <script src="https://unpkg.com/vue3-sfc-loader/dist/vue3-sfc-loader.js"></script>
+
+  <script>
+    // Loader options to fetch .vue files and inject their <style> blocks
+    const options = {
       moduleCache: { vue: Vue },
-      async getFile(url) {
-        const response = await fetch(url);
-        return await response.text();
+      getFile(url) {
+        return fetch(url).then(async res => {
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Fetch failed: ${url} (${res.status})\n${text}`);
+          }
+          return res.text();
+        });
       },
-      addStyle(text) {
+      addStyle(textContent) {
         const style = document.createElement('style');
-        style.textContent = text;
+        style.textContent = textContent;
         document.head.appendChild(style);
       }
-    }).then((App) => {
-      // Create our Vue app and show it in the <div id="app">
-      createApp(App).mount('#app');
+    };
+
+    // Async-load App.vue (and it will import components/**.vue internally)
+    const { loadModule } = window['vue3-sfc-loader'];
+
+    const App = Vue.defineAsyncComponent(() => loadModule('./App.vue', options));
+
+    const app = Vue.createApp({
+      components: { App },
+      template: '<App />'
     });
+
+    app.mount('#app');
   </script>
 </body>
 </html>
