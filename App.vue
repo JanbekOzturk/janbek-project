@@ -31,40 +31,42 @@
     />
 
     <!-- Lessons -->
-    <section v-if="!showCart">
-      <h1>Browse &amp; Book</h1>
+   <section v-if="!showCart">
+  <h1>Browse &amp; Book</h1>
 
-      <!-- Toolbar: Search + Sort -->
-      <div class="toolbar">
-        <div class="search-bar">
-          <label for="search">Search:</label>
-          <input
-            id="search"
-            v-model.trim="searchText"
-            type="text"
-            placeholder="Subject or location"
-          />
-          <button v-if="searchText" class="ghost-btn small" @click="searchText = ''">Clear</button>
-        </div>
-
-        <div class="sort-bar toolbar-right">
-          <label for="sort">Sort by:</label>
-          <select id="sort" v-model="selectedSort" @change="sortLessons">
-            <option value="default">Default</option>
-            <option value="price">Price (Low → High)</option>
-            <option value="availability">Availability (Most → Least)</option>
-            <option value="location">Location (A → Z)</option>
-          </select>
-        </div>
+    <!-- Toolbar: Search + Sort -->
+    <div class="toolbar">
+      <div class="search-bar">
+        <label for="search">Search:</label>
+        <input
+          id="search"
+          v-model.trim="searchText"
+          type="text"
+          placeholder="Subject or location"
+        />
+        <button v-if="searchText" class="ghost-btn small" @click="searchText = ''">Clear</button>
       </div>
 
-      <LessonList
-        :lessons="filteredLessons"
-        :selectedLesson="selectedLesson"
-        @select="select"
-        @book="book"
-      />
-    </section>
+      <div class="sort-bar toolbar-right">
+        <label for="sort">Sort by:</label>
+        <select id="sort" v-model="selectedSort" @change="sortLessons">
+          <option value="default">Default</option>
+          <option value="price">Price (Low → High)</option>
+          <option value="availability">Availability (Most → Least)</option>
+          <option value="location">Location (A → Z)</option>
+        </select>
+      </div>
+    </div>
+
+  <!-- IMPORTANT: use filteredLessons, not lessons -->
+  <LessonList
+    :lessons="filteredLessons"
+    :selectedLesson="selectedLesson"
+    @select="select"
+    @book="book"
+  />
+</section>
+
 
     <!-- Cart page -->
     <section v-else class="cart-wrap">
@@ -176,7 +178,8 @@ export default {
         if (s.indexOf(term) != -1 || loc.indexOf(term) != -1) out.push(l);
       }
       return out;
-    }
+    },
+
   },
 
   methods: {
