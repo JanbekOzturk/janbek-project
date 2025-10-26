@@ -18,7 +18,7 @@
       </div>
     </header>
 
-    <!-- Banner / Hero -->
+    <!-- Hero / Banner -->
     <Hero
       :banners="banners"
       :currentBanner="currentBanner"
@@ -30,43 +30,41 @@
       @pause="pause"
     />
 
-    <!-- Lessons -->
-   <section v-if="!showCart">
-  <h1>Browse &amp; Book</h1>
+    <!-- Lessons page -->
+    <section v-if="!showCart">
+      <h1>Browse &amp; Book</h1>
 
-    <!-- Toolbar: Search + Sort -->
-    <div class="toolbar">
-      <div class="search-bar">
-        <label for="search">Search:</label>
-        <input
-          id="search"
-          v-model.trim="searchText"
-          type="text"
-          placeholder="Subject or location"
-        />
-        <button v-if="searchText" class="ghost-btn small" @click="searchText = ''">Clear</button>
+      <!-- Toolbar: Search + Sort -->
+      <div class="toolbar">
+        <div class="search-bar">
+          <label for="search">Search:</label>
+          <input
+            id="search"
+            v-model.trim="searchText"
+            type="text"
+            placeholder="Subject or location"
+          />
+          <button v-if="searchText" class="ghost-btn small" @click="searchText = ''">Clear</button>
+        </div>
+
+        <div class="sort-bar toolbar-right">
+          <label for="sort">Sort by:</label>
+          <select id="sort" v-model="selectedSort" @change="sortLessons">
+            <option value="default">Default</option>
+            <option value="price">Price (Low → High)</option>
+            <option value="availability">Availability (Most → Least)</option>
+            <option value="location">Location (A → Z)</option>
+          </select>
+        </div>
       </div>
 
-      <div class="sort-bar toolbar-right">
-        <label for="sort">Sort by:</label>
-        <select id="sort" v-model="selectedSort" @change="sortLessons">
-          <option value="default">Default</option>
-          <option value="price">Price (Low → High)</option>
-          <option value="availability">Availability (Most → Least)</option>
-          <option value="location">Location (A → Z)</option>
-        </select>
-      </div>
-    </div>
-
-  <!-- IMPORTANT: use filteredLessons, not lessons -->
-  <LessonList
-    :lessons="filteredLessons"
-    :selectedLesson="selectedLesson"
-    @select="select"
-    @book="book"
-  />
-</section>
-
+      <LessonList
+        :lessons="filteredLessons"
+        :selectedLesson="selectedLesson"
+        @select="select"
+        @book="book"
+      />
+    </section>
 
     <!-- Cart page -->
     <section v-else class="cart-wrap">
@@ -110,20 +108,24 @@ export default {
 
   data: function () {
     return {
+      // banner
       banners: ['images/banner1.jpg','images/banner2.jpg','images/banner3.jpg'],
       currentBanner: 0,
       rotator: null,
 
+      // page state
       selectedLesson: null,
       showCart: false,
 
+      // user + cart
       cart: [],
       customer: { name: "", phone: "" },
 
-      // NEW: search + sort
+      // search + sort (PERSISTED)
       searchText: "",
       selectedSort: 'default',
 
+      // lessons
       lessons: [
         { id:1, subject:"Lego Robotics", location:"Hendon", price:90, spaces:5, img:"images/lego.jpg",
           desc:"Build and program LEGO robots with sensors. Races, maze challenges, and team missions each week." },
@@ -164,12 +166,10 @@ export default {
       for (var i = 0; i < this.cart.length; i++) total += this.cart[i].price * this.cart[i].qty;
       return total;
     },
-
-    // NEW: filter by subject OR location (case-insensitive)
+    // filter by subject OR location (case-insensitive)
     filteredLessons: function () {
       var term = this.searchText.trim().toLowerCase();
       if (term == "") return this.lessons;
-
       var out = [];
       for (var i = 0; i < this.lessons.length; i++) {
         var l = this.lessons[i];
@@ -178,17 +178,44 @@ export default {
         if (s.indexOf(term) != -1 || loc.indexOf(term) != -1) out.push(l);
       }
       return out;
-    },
+    }
+  },
 
+  watch: {
+    // persist cart (deep watch)
+    cart: {
+      handler: function () {
+        localStorage.setItem('asa_cart', JSON.stringify(this.cart));
+      },
+      deep: true
+    },
+    // persist sort + search as the user changes them
+    selectedSort: function (v) { localStorage.setItem('asa_sort', v); },
+    searchText:  function (v) { localStorage.setItem('asa_search', v); }
   },
 
   methods: {
+    // --- helpers for persistence ---
+    applyCartToLessons: function () {
+      // Reset all spaces to 5 (original) then subtract cart quantities
+      // If you later load lessons from a backend, remove the reset.
+      for (var i = 0; i < this.lessons.length; i++) this.lessons[i].spaces = 5;
+      for (var c = 0; c < this.cart.length; c++) {
+        var item = this.cart[c];
+        var lesson = this.getLessonById(item.id);
+        if (lesson) {
+          var newSpaces = lesson.spaces - item.qty;
+          lesson.spaces = newSpaces < 0 ? 0 : newSpaces;
+        }
+      }
+    },
+
     getLessonById: function (id) {
       for (var i = 0; i < this.lessons.length; i++) if (this.lessons[i].id === id) return this.lessons[i];
       return null;
     },
 
-    // sort current list (mutates lessons array)
+    // sorting
     sortLessons: function () {
       if (this.selectedSort == "price") {
         this.lessons.sort(function (a, b) { return a.price - b.price; });
@@ -209,13 +236,14 @@ export default {
       this.showCart = true;
     },
 
+    // selection / modal
     select: function (lesson) { this.selectedLesson = lesson; this.pause(); },
     clearSelection: function () { this.selectedLesson = null; this.play(); },
 
+    // carousel
     next: function () { this.currentBanner = (this.currentBanner + 1) % this.banners.length; },
     prev: function () { this.currentBanner = (this.currentBanner - 1 + this.banners.length) % this.banners.length; },
     go:   function (i) { this.currentBanner = i; },
-
     play: function () {
       if (this.rotator == null) {
         var self = this;
@@ -224,6 +252,7 @@ export default {
     },
     pause: function () { if (this.rotator != null) { clearInterval(this.rotator); this.rotator = null; } },
 
+    // cart
     book: function (lesson) {
       if (lesson.spaces === 0) return;
       var existing = -1;
@@ -232,7 +261,6 @@ export default {
       else this.cart.push({ id: lesson.id, subject: lesson.subject, price: lesson.price, qty: 1 });
       lesson.spaces = lesson.spaces - 1;
     },
-
     increase: function (item) {
       var lesson = this.getLessonById(item.id);
       if (lesson && lesson.spaces > 0) { item.qty = item.qty + 1; lesson.spaces = lesson.spaces - 1; }
@@ -250,7 +278,6 @@ export default {
       for (var i = 0; i < this.cart.length; i++) if (this.cart[i].id != item.id) newCart.push(this.cart[i]);
       this.cart = newCart;
     },
-
     checkout: function () {
       var nameValid = /^[A-Za-z\s]+$/.test(this.customer.name.trim());
       var phoneValid = /^\d+$/.test(this.customer.phone.trim());
@@ -263,6 +290,28 @@ export default {
     goHome: function () { this.showCart = false; this.clearSelection(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
   },
 
-  mounted: function () { this.play(); }
+  mounted: function () {
+    
+    // Load persisted state when we refresh for cart and sorting and search
+    try {
+      var savedCart = localStorage.getItem('asa_cart');
+      var savedSort = localStorage.getItem('asa_sort');
+      var savedSearch = localStorage.getItem('asa_search');
+
+      if (savedCart) this.cart = JSON.parse(savedCart);
+      if (savedSort) this.selectedSort = savedSort;
+      if (savedSearch) this.searchText = savedSearch;
+
+      // Re-apply spaces based on saved cart
+      if (this.cart.length > 0) this.applyCartToLessons();
+
+      // Ensure lessons are in the saved sort order
+      this.sortLessons();
+    } catch (e) {
+      console.warn('Could not load saved state:', e);
+    }
+
+    this.play();
+  }
 }
 </script>
