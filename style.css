@@ -169,13 +169,13 @@ li:hover {
   margin-bottom: 0.5rem;
 }
 
-/* Sort bar — align with page container and center the controls */
+/* keep the sort bar aligned with the rest of the page */
 .sort-bar {
   max-width: var(--container);   /* same width as header/hero/grid */
-  margin: 0 auto 1rem;           /* center the whole bar */
-  padding: 0 12px;               /* match grid side padding */
+  margin: 0 auto 1rem;           /* center horizontally */
+  padding: 0 12px;
   display: flex;
-  justify-content: center;       /* center under "Browse & Book" */
+  justify-content: center;       /* put label + dropdown in the middle */
   align-items: center;
   gap: 0.6rem;
 }
