@@ -35,13 +35,14 @@
       <h1>Browse &amp; Book</h1>
 
       <!-- Toolbar: Search + Sort -->
+      <!-- Also ensures prefs persist as user types -->
       <div class="toolbar">
         <div class="search-bar">
           <label for="search">Search:</label>
           <input
             id="search"
             v-model.trim="searchText"
-            @input="savePrefs"         <!-- ensure prefs persist as you type -->
+            @input="savePrefs"         
             type="text"
             placeholder="Subject or location"
           />
