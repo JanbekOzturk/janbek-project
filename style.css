@@ -169,12 +169,15 @@ li:hover {
   margin-bottom: 0.5rem;
 }
 
+/* Sort bar — align with page container and center the controls */
 .sort-bar {
+  max-width: var(--container);   /* same width as header/hero/grid */
+  margin: 0 auto 1rem;           /* center the whole bar */
+  padding: 0 12px;               /* match grid side padding */
   display: flex;
-  justify-content: center;
+  justify-content: center;       /* center under "Browse & Book" */
   align-items: center;
   gap: 0.6rem;
-  margin-bottom: 1rem;
 }
 
 .sort-bar label {
@@ -189,6 +192,7 @@ li:hover {
   background: #fff;
   cursor: pointer;
 }
+
 
 /* Card text layout */
 .card-title {
