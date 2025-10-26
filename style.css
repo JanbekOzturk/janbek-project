@@ -169,6 +169,51 @@ li:hover {
   margin-bottom: 0.5rem;
 }
 
+/* Toolbar (wraps search + sort) */
+.toolbar {
+  max-width: var(--container);
+  margin: 0 auto 1rem;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap; /* stack on small screens */
+}
+
+/* Search input */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.search-bar input {
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  background: #fff;
+  min-width: 240px;
+}
+
+/* Reuse your sort styles but let it sit on the right in the toolbar */
+.sort-bar.toolbar-right {
+  margin: 0;
+  padding: 0;
+  justify-content: flex-end;
+}
+
+/* Small ghost button used for Clear */
+.ghost-btn.small {
+  padding: 0.35rem 0.7rem;
+  border: 2px solid var(--green);
+  color: var(--dark-green);
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
 /* keep the sort bar aligned with the rest of the page */
 .sort-bar {
   max-width: var(--container);   /* same width as header/hero/grid */
