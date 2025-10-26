@@ -1,156 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Janbek Project - After School Lessons</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>After School Activities</title>
 
-  <!-- my stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <!-- Our page style -->
+  <link rel="stylesheet" href="style.css" />
 
-  <!-- using Vue 3 from the CDN -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- Vue.js library (loads from the internet, no install needed) -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+  <!-- Loader that lets the browser open .vue files (no build tools needed) -->
+  <script src="https://unpkg.com/vue3-sfc-loader/dist/vue3-sfc-loader.js"></script>
 </head>
 
 <body>
-  <div id="app">
+  <!-- Vue app will appear inside this div -->
+  <div id="app"></div>
 
-  <!-- top bar with cart toggle -->
-  <header class="topbar">
-  <!-- the name works like a “home” button -->
-  <button class="brand" @click="goHome">After School Activities</button>
+  <!-- Small and clear setup -->
+  <script type="module">
+    // Take Vue from the global variable provided by the script above
+    const { createApp } = Vue;
+    const { loadModule } = window['vue3-sfc-loader'];
 
-  <div class="topbar-actions">
-    <!-- red X shows only when cart is open -->
-    <button
-      v-if="showCart"
-      class="close-cart"
-      @click="showCart = false"
-      aria-label="Close cart"
-      title="Close Cart"
-    >✕</button>
-
-    <button class="cart-toggle" @click="showCart = !showCart">
-      🛒 Cart <span v-if="cartCount">({{ cartCount }})</span>
-    </button>
-  </div>
-</header>
-
-
-  <!-- hero -->
-  <section class="hero">
-    <div class="carousel" @mouseenter="pause" @mouseleave="play">
-      <button class="nav prev" v-if="!selectedLesson" @click="prev">‹</button>
-      <img
-        :src="currentHeroSrc"
-        :key="currentHeroKey"
-        :alt="selectedLesson ? selectedLesson.subject : 'banner image'"
-        class="slide"
-        draggable="false"
-      />
-      <button class="nav next" v-if="!selectedLesson" @click="next">›</button>
-      <div class="dots" v-if="!selectedLesson">
-        <button v-for="(img, i) in banners" :key="i" class="dot"
-                :class="{ active: i === currentBanner }" @click="go(i)"></button>
-      </div>
-    </div>
-  </section>
-
-  <!-- grid view -->
-  <section v-if="!showCart">
-    <h1>Browse & Book</h1>
-    <ul>
-      <li
-        v-for="lesson in lessons"
-        :key="lesson.id"
-        @click="select(lesson)"
-        :class="{ selected: selectedLesson && selectedLesson.id === lesson.id }"
-      >
-        <img :src="lesson.img" :alt="lesson.subject" class="lesson-img" />
-        <strong>{{ lesson.subject }}</strong>
-        <div>{{ lesson.location }}</div>
-        <span>£{{ lesson.price }}</span>
-        <small class="spaces">Spaces left: {{ lesson.spaces }}</small>
-        <button
-          class="book-btn"
-          @click.stop="book(lesson)"
-          :disabled="lesson.spaces === 0"
-        >
-          {{ lesson.spaces === 0 ? 'Full' : 'Book' }}
-        </button>
-      </li>
-    </ul>
-  </section>
-
-  <!-- cart view -->
-  <section v-else class="cart-wrap">
-    <h1>My Cart</h1>
-
-    <div v-if="cart.length === 0" class="empty">
-      Cart is empty. Go add some activities!
-    </div>
-
-    <div v-else class="cart">
-      <div class="cart-row cart-head">
-        <div>Activity</div>
-        <div>Qty</div>
-        <div>Price</div>
-        <div>Total</div>
-        <div></div>
-      </div>
-
-      <div class="cart-row" v-for="item in cart" :key="item.id">
-        <div>{{ item.subject }}</div>
-        <div class="qty">
-          <button @click="decrease(item)">−</button>
-          <span>{{ item.qty }}</span>
-          <button @click="increase(item)" :disabled="getLessonById(item.id)?.spaces === 0">＋</button>
-        </div>
-        <div>£{{ item.price }}</div>
-        <div>£{{ item.price * item.qty }}</div>
-        <div><button class="remove" @click="remove(item)">Remove</button></div>
-      </div>
-
-      <div class="cart-total">Grand total: <strong>£{{ grandTotal }}</strong></div>
-
-      <!-- checkout form placeholder (we’ll wire validation next) -->
-      <form class="checkout" @submit.prevent="checkout">
-        <input type="text" v-model="customer.name" placeholder="Your name" />
-        <input type="tel" v-model="customer.phone" placeholder="Phone number" />
-        <button class="book-btn lg" :disabled="cart.length===0">Checkout</button>
-      </form>
-    </div>
-  </section>
-
-  <!-- modal -->
-  <div class="modal-backdrop" v-if="selectedLesson" @click.self="clearSelection">
-    <div class="modal-card" role="dialog" aria-modal="true">
-      <img :src="selectedLesson.img" :alt="selectedLesson.subject" class="modal-img" />
-      <div class="modal-body">
-        <h2>{{ selectedLesson.subject }}</h2>
-        <p class="muted">{{ selectedLesson.location }}</p>
-        <p class="price">£{{ selectedLesson.price }}</p>
-        <p class="desc">{{ selectedLesson.desc }}</p>
-        <div class="modal-actions">
-          <button class="book-btn lg" @click="book(selectedLesson)" :disabled="selectedLesson.spaces===0">
-            {{ selectedLesson.spaces===0 ? 'Full' : 'Book' }}
-          </button>
-          <button class="ghost-btn" @click="clearSelection">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- prod Vue + cache-bust -->
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="script.js?v=6"></script>
-
-
-  <!-- VUE3-->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-  <script src="script.js?v=5"></script>
+    // Simple setup for loading our main App.vue file
+    loadModule('App.vue', {
+      moduleCache: { vue: Vue },
+      async getFile(url) {
+        const response = await fetch(url);
+        return await response.text();
+      },
+      addStyle(text) {
+        const style = document.createElement('style');
+        style.textContent = text;
+        document.head.appendChild(style);
+      }
+    }).then((App) => {
+      // Create our Vue app and show it in the <div id="app">
+      createApp(App).mount('#app');
+    });
+  </script>
 </body>
-
 </html>
