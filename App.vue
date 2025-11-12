@@ -1,13 +1,13 @@
 <template>
   <div>
-    <!-- Page header -->
+    <!-- Header: brand takes me home (lessons), cart button opens cart -->
     <header class="topbar">
       <button class="brand" @click="goHome">After School Activities</button>
 
       <div class="topbar-actions">
         <button v-if="showCart" class="close-cart" @click="showCart = false">✕</button>
 
-        <!-- Cart button (greyed out when empty) -->
+        <!-- Cart button (disabled if empty) -->
         <button
           class="cart-toggle"
           :class="{ disabled: cartCount == 0 }"
@@ -18,7 +18,7 @@
       </div>
     </header>
 
-    <!-- Hero / Banner -->
+    <!-- Hero banner (simple image rotator) -->
     <Hero
       :banners="banners"
       :currentBanner="currentBanner"
@@ -30,19 +30,18 @@
       @pause="pause"
     />
 
-    <!-- Lessons page -->
+    <!-- Lessons page (default view) -->
     <section v-if="!showCart">
       <h1>Browse &amp; Book</h1>
 
-      <!-- Toolbar: Search + Sort -->
-      <!-- Also ensures prefs persist as user types -->
+      <!-- Toolbar: I keep search/sort in localStorage so they stick on reload -->
       <div class="toolbar">
         <div class="search-bar">
           <label for="search">Search:</label>
           <input
             id="search"
             v-model.trim="searchText"
-            @input="savePrefs"         
+            @input="savePrefs"
             type="text"
             placeholder="Subject or location"
           />
@@ -76,11 +75,17 @@
         Cart is empty. Go add some activities!
       </div>
 
+      <!-- Checkout collects email + phone; validation stays in App -->
       <CartView
         v-else
         :cart="cart"
         :lessons="lessons"
         :grandTotal="grandTotal"
+        :email="customerEmail"
+        :phone="customer.phone"
+        :canCheckout="cart.length > 0"
+        @update:email="v => (customerEmail = v)"
+        @update:phone="v => (customer.phone = v)"
         @increase="increase"
         @decrease="decrease"
         @remove="removeItem"
@@ -88,7 +93,7 @@
       />
     </section>
 
-    <!-- Lesson modal -->
+    <!-- Lesson details modal -->
     <LessonModal
       v-if="selectedLesson"
       :lesson="selectedLesson"
@@ -110,24 +115,26 @@ export default {
 
   data: function () {
     return {
-      // banner
+      // Banner rotator state
       banners: ['images/banner1.jpg','images/banner2.jpg','images/banner3.jpg'],
       currentBanner: 0,
       rotator: null,
 
-      // page state
+      // Page state
       selectedLesson: null,
       showCart: false,
 
-      // user + cart
+      // Cart + checkout data
       cart: [],
+      // I keep name for later if needed; phone is used; email stored separately
       customer: { name: "", phone: "" },
+      customerEmail: "",
 
-      // search + sort (persisted)
+      // Search + sort (persisted)
       searchText: "",
-      selectedSort: 'default',
+      selectedSort: "default",
 
-      // lessons
+      // Lessons seed data (each starts with 5 spaces)
       lessons: [
         { id:1, subject:"Lego Robotics", location:"Hendon", price:90, spaces:5, img:"images/lego.jpg",
           desc:"Build and program LEGO robots with sensors. Races, maze challenges, and team missions each week." },
@@ -158,33 +165,46 @@ export default {
   },
 
   computed: {
+    // Total items in cart
     cartCount: function () {
       var total = 0;
-      for (var i = 0; i < this.cart.length; i++) total += this.cart[i].qty;
+      for (var i = 0; i < this.cart.length; i = i + 1) {
+        total = total + this.cart[i].qty;
+      }
       return total;
     },
+
+    // Total price for all items
     grandTotal: function () {
-      var total = 0;
-      for (var i = 0; i < this.cart.length; i++) total += this.cart[i].price * this.cart[i].qty;
-      return total;
+      var sum = 0;
+      for (var i = 0; i < this.cart.length; i = i + 1) {
+        sum = sum + (this.cart[i].price * this.cart[i].qty);
+      }
+      return sum;
     },
-    // filter by subject OR location (case-insensitive)
+
+    // Filter by subject OR location (case-insensitive)
     filteredLessons: function () {
       var term = this.searchText.trim().toLowerCase();
-      if (term == "") return this.lessons;
+      if (term == "") {
+        return this.lessons;
+      }
       var out = [];
-      for (var i = 0; i < this.lessons.length; i++) {
+      for (var i = 0; i < this.lessons.length; i = i + 1) {
         var l = this.lessons[i];
         var s = l.subject.toLowerCase();
         var loc = l.location.toLowerCase();
-        if (s.indexOf(term) != -1 || loc.indexOf(term) != -1) out.push(l);
+        if (s.indexOf(term) != -1 || loc.indexOf(term) != -1) {
+          out.push(l);
+        }
       }
       return out;
     }
   },
 
   methods: {
-    /* ---------- persistence helpers ---------- */
+    /* ---------- persistence ---------- */
+    // I save cart and toolbar prefs so they survive page refresh.
     saveCart: function () {
       try {
         localStorage.setItem('asa_cart', JSON.stringify(this.cart));
@@ -204,26 +224,39 @@ export default {
       this.searchText = "";
       this.savePrefs();
     },
+
+    // When I restore the cart, I rebuild lesson spaces from it.
     applyCartToLessons: function () {
-      // reset spaces to original (5) then subtract items in cart
-      for (var i = 0; i < this.lessons.length; i++) this.lessons[i].spaces = 5;
-      for (var c = 0; c < this.cart.length; c++) {
-        var item = this.cart[c];
+      var i;
+      for (i = 0; i < this.lessons.length; i = i + 1) {
+        this.lessons[i].spaces = 5;
+      }
+      for (i = 0; i < this.cart.length; i = i + 1) {
+        var item = this.cart[i];
         var lesson = this.getLessonById(item.id);
         if (lesson) {
           var newSpaces = lesson.spaces - item.qty;
-          lesson.spaces = newSpaces < 0 ? 0 : newSpaces;
+          if (newSpaces < 0) {
+            lesson.spaces = 0;
+          } else {
+            lesson.spaces = newSpaces;
+          }
         }
       }
     },
 
-    /* ---------- core helpers ---------- */
+    /* ---------- helpers ---------- */
     getLessonById: function (id) {
-      for (var i = 0; i < this.lessons.length; i++) if (this.lessons[i].id === id) return this.lessons[i];
+      for (var i = 0; i < this.lessons.length; i = i + 1) {
+        if (this.lessons[i].id === id) {
+          return this.lessons[i];
+        }
+      }
       return null;
     },
 
-    // sorting
+    /* ---------- sorting ---------- */
+    // I sort the list in-place based on the selected option.
     sortLessons: function () {
       if (this.selectedSort == "price") {
         this.lessons.sort(function (a, b) { return a.price - b.price; });
@@ -231,7 +264,8 @@ export default {
         this.lessons.sort(function (a, b) { return b.spaces - a.spaces; });
       } else if (this.selectedSort == "location") {
         this.lessons.sort(function (a, b) {
-          var A = a.location.toLowerCase(), B = b.location.toLowerCase();
+          var A = a.location.toLowerCase();
+          var B = b.location.toLowerCase();
           if (A < B) return -1; if (A > B) return 1; return 0;
         });
       } else {
@@ -243,33 +277,63 @@ export default {
       this.savePrefs();
     },
 
-    // cart / ui
+    /* ---------- cart + UI ---------- */
     openCart: function () {
-      if (this.cartCount == 0) { alert("Your cart is empty. Add some lessons first!"); return; }
+      if (this.cartCount == 0) {
+        alert("Your cart is empty. Add some lessons first!");
+        return;
+      }
       this.showCart = true;
     },
-    select: function (lesson) { this.selectedLesson = lesson; this.pause(); },
-    clearSelection: function () { this.selectedLesson = null; this.play(); },
+    select: function (lesson) {
+      this.selectedLesson = lesson;
+      this.pause();
+    },
+    clearSelection: function () {
+      this.selectedLesson = null;
+      this.play();
+    },
 
-    // carousel
-    next: function () { this.currentBanner = (this.currentBanner + 1) % this.banners.length; },
-    prev: function () { this.currentBanner = (this.currentBanner - 1 + this.banners.length) % this.banners.length; },
-    go:   function (i) { this.currentBanner = i; },
+    /* ---------- banner controls ---------- */
+    next: function () {
+      this.currentBanner = (this.currentBanner + 1) % this.banners.length;
+    },
+    prev: function () {
+      this.currentBanner = (this.currentBanner - 1 + this.banners.length) % this.banners.length;
+    },
+    go: function (i) {
+      this.currentBanner = i;
+    },
     play: function () {
       if (this.rotator == null) {
         var self = this;
         this.rotator = setInterval(function () { self.next(); }, 4000);
       }
     },
-    pause: function () { if (this.rotator != null) { clearInterval(this.rotator); this.rotator = null; } },
+    pause: function () {
+      if (this.rotator != null) {
+        clearInterval(this.rotator);
+        this.rotator = null;
+      }
+    },
 
-    // cart mutations (now call saveCart() every time)
+    /* ---------- cart mutations ---------- */
+    // Add one to cart and reduce available spaces.
     book: function (lesson) {
-      if (lesson.spaces === 0) return;
-      var existing = -1;
-      for (var i = 0; i < this.cart.length; i++) if (this.cart[i].id === lesson.id) existing = i;
-      if (existing != -1) this.cart[existing].qty = this.cart[existing].qty + 1;
-      else this.cart.push({ id: lesson.id, subject: lesson.subject, price: lesson.price, qty: 1 });
+      if (lesson.spaces === 0) {
+        return;
+      }
+      var index = -1;
+      for (var i = 0; i < this.cart.length; i = i + 1) {
+        if (this.cart[i].id === lesson.id) {
+          index = i;
+        }
+      }
+      if (index != -1) {
+        this.cart[index].qty = this.cart[index].qty + 1;
+      } else {
+        this.cart.push({ id: lesson.id, subject: lesson.subject, price: lesson.price, qty: 1 });
+      }
       lesson.spaces = lesson.spaces - 1;
       this.saveCart();
     },
@@ -283,7 +347,9 @@ export default {
     },
     decrease: function (item) {
       var lesson = this.getLessonById(item.id);
-      if (!lesson) return;
+      if (!lesson) {
+        return;
+      }
       if (item.qty > 1) {
         item.qty = item.qty - 1;
         lesson.spaces = lesson.spaces + 1;
@@ -294,41 +360,61 @@ export default {
     },
     removeItem: function (item) {
       var lesson = this.getLessonById(item.id);
-      if (lesson) lesson.spaces = lesson.spaces + item.qty;
-      this.cart = this.cart.filter(i => i.id != item.id);
+      if (lesson) {
+        lesson.spaces = lesson.spaces + item.qty;
+      }
+      this.cart = this.cart.filter(function (i) { return i.id != item.id; });
       this.saveCart();
     },
+
+    /* ---------- checkout ---------- */
+    // I validate email + phone here (simple, user-friendly regexes).
     checkout: function () {
-      var nameValid = /^[A-Za-z\s]+$/.test(this.customer.name.trim());
-      var phoneValid = /^\d+$/.test(this.customer.phone.trim());
-      if (!nameValid || !phoneValid) { alert("Please enter a valid Name (letters) and Phone (numbers)."); return; }
-      if (this.cart.length == 0) { alert("Your cart is empty."); return; }
-      alert("Order submitted! Thank you.");
+      var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((this.customerEmail || "").trim());
+      var phoneOk = /^[+]?[\d\s().-]{7,20}$/.test((this.customer.phone || "").trim());
+
+      if (!emailOk || !phoneOk) {
+        alert("Please enter a valid Email and Phone.");
+        return;
+      }
+      if (this.cart.length == 0) {
+        alert("Your cart is empty.");
+        return;
+      }
+
+      alert("Order submitted! Thank you.\nEmail: " + this.customerEmail + "\nPhone: " + this.customer.phone);
+
+      // Reset UI and storage
       this.cart = [];
-      this.customer = { name: "", phone: "" };
+      this.customerEmail = "";
+      this.customer.phone = "";
       this.showCart = false;
-      this.saveCart();   // clear persisted cart too
+      this.saveCart();
     },
 
-    goHome: function () { this.showCart = false; this.clearSelection(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    // Scroll to top and show lessons
+    goHome: function () {
+      this.showCart = false;
+      this.clearSelection();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   },
 
   mounted: function () {
-    // Load persisted state
+    // On load I restore state and rebuild spaces from the cart.
     try {
-      var savedCart   = localStorage.getItem('asa_cart');
-      var savedSort   = localStorage.getItem('asa_sort');
-      var savedSearch = localStorage.getItem('asa_search');
+      var savedCart   = localStorage.getItem("asa_cart");
+      var savedSort   = localStorage.getItem("asa_sort");
+      var savedSearch = localStorage.getItem("asa_search");
 
-      if (savedCart)   this.cart = JSON.parse(savedCart);
-      if (savedSort)   this.selectedSort = savedSort;
-      if (savedSearch) this.searchText = savedSearch;
+      if (savedCart)   { this.cart = JSON.parse(savedCart); }
+      if (savedSort)   { this.selectedSort = savedSort; }
+      if (savedSearch) { this.searchText = savedSearch; }
 
-      // Apply cart → lesson spaces, then ensure sort is applied
-      if (this.cart.length > 0) this.applyCartToLessons();
+      if (this.cart.length > 0) { this.applyCartToLessons(); }
       this.sortLessons();
     } catch (e) {
-      console.warn('Could not load saved state:', e);
+      console.warn("Could not load saved state:", e);
     }
 
     this.play();

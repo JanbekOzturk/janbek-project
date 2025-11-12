@@ -32,10 +32,39 @@
       Grand total: <strong>£{{ grandTotal }}</strong>
     </div>
 
-    <!-- checkout form lives in App (data + validation), we just trigger it -->
-    <form class="checkout" @submit.prevent="$emit('checkout')">
-      <button class="book-btn lg" :disabled="cart.length === 0">Checkout</button>
-    </form>
+    <!-- Checkout details -->
+    <section class="checkout">
+      <h3 class="checkout-title">Checkout details</h3>
+
+      <label class="field">
+        <span>Email</span>
+        <input
+          type="email"
+          :value="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          inputmode="email"
+          @input="$emit('update:email', $event.target.value)"
+        />
+      </label>
+
+      <label class="field">
+        <span>Phone</span>
+        <input
+          type="tel"
+          :value="phone"
+          placeholder="+44 7123 456789"
+          autocomplete="tel"
+          inputmode="tel"
+          @input="$emit('update:phone', $event.target.value)"
+        />
+      </label>
+
+      <!-- checkout form lives in App (data + validation), we just trigger it -->
+      <form class="checkout-actions" @submit.prevent="$emit('checkout')">
+        <button class="book-btn lg" :disabled="cart.length === 0 || !canCheckout">Checkout</button>
+      </form>
+    </section>
   </div>
 </template>
 
@@ -45,7 +74,12 @@ export default {
   props: {
     cart: { type: Array, required: true },
     lessons: { type: Array, required: true },
-    grandTotal: { type: Number, required: true }
+    grandTotal: { type: Number, required: true },
+    // new controlled inputs
+    email: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    // let the parent (App) decide if checkout is enabled (after validation)
+    canCheckout: { type: Boolean, default: true }
   },
   methods: {
     getLessonById: function (id) {
@@ -54,6 +88,21 @@ export default {
       }
       return null;
     }
-  }
+  },
+  emits: ['decrease', 'increase', 'remove', 'checkout', 'update:email', 'update:phone']
 }
 </script>
+
+<style scoped>
+.checkout { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee; }
+.checkout-title { font-weight: 600; margin-bottom: .5rem; }
+.field { display: flex; flex-direction: column; gap: .25rem; margin-bottom: .75rem; }
+.field input {
+  padding: .6rem .7rem;
+  border: 1px solid #ddd;
+  border-radius: .6rem;
+  outline: none;
+}
+.field input:focus { border-color: #c6d0c0; box-shadow: 0 0 0 3px rgba(198,208,192,.25); }
+.checkout-actions .book-btn.lg:disabled { opacity: .5; cursor: not-allowed; }
+</style>
