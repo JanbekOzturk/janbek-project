@@ -35,7 +35,7 @@ body {
   align-items: center;
 }
 
-/* --- disable the cart if its empty (2pts) --- */
+/* --- disable the cart if it's empty --- */
 .cart-toggle.disabled {
   background-color: #ccc;
   color: #666;
@@ -43,11 +43,7 @@ body {
   opacity: 0.7;
   transition: background-color 0.3s ease;
 }
-
-.cart-toggle.disabled:hover {
-  background-color: #ccc;
-}
-
+.cart-toggle.disabled:hover { background-color: #ccc; }
 
 .brand {
   background: none;
@@ -79,7 +75,7 @@ h1 {
   margin: 0.4rem 0 0.8rem;
 }
 
-/* ===== Hero / Carousel (compact like the old one) ===== */
+/* ===== Hero / Carousel ===== */
 .hero {
   max-width: var(--container);
   margin: 0.6rem auto 1rem;
@@ -94,7 +90,6 @@ h1 {
   background: var(--cream);
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
-
 .carousel .slide {
   width: 100%;
   height: 100%;
@@ -137,17 +132,16 @@ h1 {
 }
 .carousel .dot.active { background: #fff; border-color: #fff; }
 
-/* ===== Lesson grid (3 columns desktop like the reference) ===== */
+/* ===== Lesson grid (3 columns desktop) ===== */
 ul {
   list-style: none;
   max-width: var(--container);
   margin: 0 auto;
   padding: 0 12px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);   /* exactly 3 */
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.2rem 1.4rem;
 }
-
 li {
   background: var(--cream);
   border-radius: 12px;
@@ -163,7 +157,7 @@ li:hover {
 
 .lesson-img {
   width: 100%;
-  height: 120px;                /* small, tidy thumbnails like before */
+  height: 120px;                /* small, tidy thumbnails */
   object-fit: cover;
   border-radius: 10px;
   margin-bottom: 0.5rem;
@@ -195,7 +189,7 @@ li:hover {
   min-width: 240px;
 }
 
-/* Reuse your sort styles but let it sit on the right in the toolbar */
+/* Sort aligned to the right inside the toolbar */
 .sort-bar.toolbar-right {
   margin: 0;
   padding: 0;
@@ -213,76 +207,6 @@ li:hover {
   cursor: pointer;
 }
 
-
-/* keep the sort bar aligned with the rest of the page */
-.sort-bar {
-  max-width: var(--container);   /* same width as header/hero/grid */
-  margin: 0 auto 1rem;           /* center horizontally */
-  padding: 0 12px;
-  display: flex;
-  justify-content: center;       /* put label + dropdown in the middle */
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.sort-bar label {
-  font-weight: 600;
-  color: var(--dark-green);
-}
-
-.sort-bar select {
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid #aaa;
-  background: #fff;
-  cursor: pointer;
-}
-
-/* Toolbar (wraps search + sort) */
-.toolbar {
-  max-width: var(--container);
-  margin: 0 auto 1rem;
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap; /* stack on small screens */
-}
-
-/* Search input */
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-.search-bar input {
-  padding: 0.45rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid #aaa;
-  background: #fff;
-  min-width: 240px;
-}
-
-/* Reuse your sort styles but align to right in toolbar */
-.sort-bar.toolbar-right {
-  margin: 0;
-  padding: 0;
-  justify-content: flex-end;
-}
-
-/* Small ghost button for Clear */
-.ghost-btn.small {
-  padding: 0.35rem 0.7rem;
-  border: 2px solid var(--green);
-  color: var(--dark-green);
-  background: transparent;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-
 /* Card text layout */
 .card-title {
   margin: 0.35rem 0 0;
@@ -297,20 +221,14 @@ li:hover {
 }
 
 /* Price + spaces on separate lines */
-.meta {
-  margin: 0.25rem 0 0.6rem;
-}
+.meta { margin: 0.25rem 0 0.6rem; }
 .meta .price,
-.meta .spaces {
-  display: block;         /* force new line */
-}
+.meta .spaces { display: block; }
 
-/* Center the Book button */
 .actions {
   display: flex;
   justify-content: center;
 }
-
 .book-btn {
   background: var(--green);
   color: #fff;
@@ -323,11 +241,10 @@ li:hover {
 .book-btn:hover { background: var(--dark-green); }
 .book-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-
 .spaces { color:#666; }
 
 /* ===== Cart ===== */
-.cart-wrap { max-width: 900px; margin: 0 auto; }
+.cart-wrap { max-width: var(--container); margin: 0 auto; }
 .cart {
   background: var(--cream);
   border-radius: 12px;
@@ -355,7 +272,6 @@ li:hover {
   align-items: center;
   z-index: 1000;
 }
-
 .modal-card {
   background: var(--cream);
   border-radius: 12px;
@@ -363,9 +279,8 @@ li:hover {
   max-width: 500px;
   width: 90%;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-  text-align: center; /* centers all text inside the modal */
+  text-align: center;
 }
-
 .modal-img {
   width: 100%;
   border-radius: 10px;
@@ -373,35 +288,18 @@ li:hover {
   object-fit: cover;
   height: 200px;
 }
-
-/* spacing between text elements */
 .modal-body h2 {
   margin: 0.4rem 0;
   color: var(--dark-green);
 }
-
-.modal-body .muted {
-  color: #555;
-  margin: 0.3rem 0;
-}
-
-.modal-body .price {
-  font-weight: 600;
-  margin: 0.6rem 0;
-}
-
-.modal-body .desc {
-  margin: 0.6rem 0 1.2rem;
-  line-height: 1.4;
-}
-
-/* centers both buttons horizontally */
+.modal-body .muted { color: #555; margin: 0.3rem 0; }
+.modal-body .price { font-weight: 600; margin: 0.6rem 0; }
+.modal-body .desc { margin: 0.6rem 0 1.2rem; line-height: 1.4; }
 .modal-actions {
   display: flex;
   justify-content: center;
   gap: 1rem;
 }
-
 .book-btn.lg {
   background: var(--green);
   color: #fff;
@@ -411,7 +309,6 @@ li:hover {
   font-weight: 600;
   cursor: pointer;
 }
-
 .ghost-btn {
   background: none;
   border: 2px solid var(--green);
@@ -431,3 +328,21 @@ li:hover {
   .carousel { height: 180px; }
   ul { grid-template-columns: 1fr; }
 }
+
+/* ===== Layout consistency & overflow guard ===== */
+#app {
+  max-width: var(--container);
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero,
+.toolbar,
+ul,
+.cart-wrap,
+section {
+  max-width: var(--container);
+  margin-left: auto;
+  margin-right: auto;
+}
+html, body { overflow-x: hidden; }
+img { max-width: 100%; height: auto; }
