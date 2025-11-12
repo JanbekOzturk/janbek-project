@@ -37,8 +37,7 @@
       Grand total: <strong>£{{ grandTotal }}</strong>
     </div>
 
-    <!-- Checkout section: I collect email + phone here.
-         Validation and submit logic stay in App.vue. -->
+    <!-- Checkout section: collects Email + Phone -->
     <section class="checkout">
       <h3 class="checkout-title">Checkout details</h3>
 
@@ -66,7 +65,7 @@
         />
       </label>
 
-      <!-- I just trigger checkout; App.vue handles validation + reset -->
+      <!-- App.vue handles validation + submission -->
       <form class="checkout-actions" @submit.prevent="$emit('checkout')">
         <button class="book-btn lg" :disabled="cart.length === 0 || !canCheckout">Checkout</button>
       </form>
@@ -78,34 +77,26 @@
 export default {
   name: 'CartView',
   props: {
-    // Incoming data from the parent (App.vue)
     cart: { type: Array, required: true },
     lessons: { type: Array, required: true },
     grandTotal: { type: Number, required: true },
-
-    // Controlled inputs (parent owns the state)
     email: { type: String, default: '' },
     phone: { type: String, default: '' },
-
-    // Parent decides if checkout should be enabled
     canCheckout: { type: Boolean, default: true }
   },
   methods: {
-    // Find a lesson object by id
     getLessonById: function (id) {
       for (var i = 0; i < this.lessons.length; i = i + 1) {
         if (this.lessons[i].id === id) return this.lessons[i];
       }
       return null;
     },
-    // Helper: is there at least 1 space left for this lesson?
     hasSpace: function (id) {
       var lesson = this.getLessonById(id);
       if (!lesson) return false;
       return lesson.spaces > 0;
     }
   },
-  // Events I emit to the parent
   emits: ['decrease', 'increase', 'remove', 'checkout', 'update:email', 'update:phone']
 }
 </script>
