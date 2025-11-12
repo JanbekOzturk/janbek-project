@@ -1,5 +1,6 @@
 <template>
   <div class="cart">
+    <!-- Table header -->
     <div class="cart-row cart-head">
       <div>Activity</div>
       <div>Qty</div>
@@ -8,15 +9,18 @@
       <div></div>
     </div>
 
+    <!-- One row per cart item -->
     <div class="cart-row" v-for="item in cart" :key="item.id">
       <div>{{ item.subject }}</div>
 
+      <!-- Quantity controls -->
       <div class="qty">
-        <button @click="$emit('decrease', item)">−</button>
+        <button type="button" @click="$emit('decrease', item)">−</button>
         <span>{{ item.qty }}</span>
         <button
+          type="button"
           @click="$emit('increase', item)"
-          :disabled="getLessonById(item.id) && getLessonById(item.id).spaces === 0"
+          :disabled="!hasSpace(item.id)"
         >＋</button>
       </div>
 
@@ -24,15 +28,17 @@
       <div>£{{ item.price * item.qty }}</div>
 
       <div>
-        <button class="remove" @click="$emit('remove', item)">Remove</button>
+        <button type="button" class="remove" @click="$emit('remove', item)">Remove</button>
       </div>
     </div>
 
+    <!-- Cart total -->
     <div class="cart-total">
       Grand total: <strong>£{{ grandTotal }}</strong>
     </div>
 
-    <!-- Checkout details -->
+    <!-- Checkout section: I collect email + phone here.
+         Validation and submit logic stay in App.vue. -->
     <section class="checkout">
       <h3 class="checkout-title">Checkout details</h3>
 
@@ -60,7 +66,7 @@
         />
       </label>
 
-      <!-- checkout form lives in App (data + validation), we just trigger it -->
+      <!-- I just trigger checkout; App.vue handles validation + reset -->
       <form class="checkout-actions" @submit.prevent="$emit('checkout')">
         <button class="book-btn lg" :disabled="cart.length === 0 || !canCheckout">Checkout</button>
       </form>
@@ -72,23 +78,34 @@
 export default {
   name: 'CartView',
   props: {
+    // Incoming data from the parent (App.vue)
     cart: { type: Array, required: true },
     lessons: { type: Array, required: true },
     grandTotal: { type: Number, required: true },
-    // new controlled inputs
+
+    // Controlled inputs (parent owns the state)
     email: { type: String, default: '' },
     phone: { type: String, default: '' },
-    // let the parent (App) decide if checkout is enabled (after validation)
+
+    // Parent decides if checkout should be enabled
     canCheckout: { type: Boolean, default: true }
   },
   methods: {
+    // Find a lesson object by id
     getLessonById: function (id) {
       for (var i = 0; i < this.lessons.length; i = i + 1) {
         if (this.lessons[i].id === id) return this.lessons[i];
       }
       return null;
+    },
+    // Helper: is there at least 1 space left for this lesson?
+    hasSpace: function (id) {
+      var lesson = this.getLessonById(id);
+      if (!lesson) return false;
+      return lesson.spaces > 0;
     }
   },
+  // Events I emit to the parent
   emits: ['decrease', 'increase', 'remove', 'checkout', 'update:email', 'update:phone']
 }
 </script>
