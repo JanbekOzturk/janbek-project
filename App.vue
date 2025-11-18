@@ -109,7 +109,7 @@ import LessonList from './components/LessonList.vue'
 import CartView from './components/Cart.vue'
 import LessonModal from './components/LessonModal.vue'
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = 'https://janbek-project-api.onrender.com';
 
 export default {
   name: 'App',
