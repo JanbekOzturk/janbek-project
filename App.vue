@@ -109,6 +109,8 @@ import LessonList from './components/LessonList.vue'
 import CartView from './components/Cart.vue'
 import LessonModal from './components/LessonModal.vue'
 
+const API_BASE_URL = 'http://localhost:4000';
+
 export default {
   name: 'App',
   components: { Hero, LessonList, CartView, LessonModal },
@@ -126,7 +128,6 @@ export default {
 
       // Cart + checkout data
       cart: [],
-      // I keep name for later if needed; phone is used; email stored separately
       customer: { name: "", phone: "" },
       customerEmail: "",
 
@@ -134,33 +135,10 @@ export default {
       searchText: "",
       selectedSort: "default",
 
-      // Lessons seed data (each starts with 5 spaces)
-      lessons: [
-        { id:1, subject:"Lego Robotics", location:"Hendon", price:90, spaces:5, img:"images/lego.jpg",
-          desc:"Build and program LEGO robots with sensors. Races, maze challenges, and team missions each week." },
-        { id:2, subject:"Creative Art Club", location:"Colindale", price:70, spaces:5, img:"images/art.jpg",
-          desc:"Paint, collage, and clay! Learn color mixing, texture, and try mini-projects you can take home." },
-        { id:3, subject:"Junior Coding", location:"Brent Cross", price:100, spaces:5, img:"images/coding.jpg",
-          desc:"Start with Scratch and move to simple web pages. Make mini-games while learning logic step by step." },
-        { id:4, subject:"Football Training", location:"Golders Green", price:60, spaces:5, img:"images/football.jpg",
-          desc:"Dribbling, passing, shooting, and teamwork drills. Friendly mini-matches every session." },
-        { id:5, subject:"Music Band Practice", location:"Hendon", price:80, spaces:5, img:"images/music.jpg",
-          desc:"Try drums, keys, guitar, and singing. Learn rhythm and play easy songs together as a band." },
-        { id:6, subject:"Dance & Movement", location:"Colindale", price:75, spaces:5, img:"images/dance.jpg",
-          desc:"Hip-hop and jazz basics with fun warm-ups, simple choreography, and confidence on stage." },
-        { id:7, subject:"Cooking for Kids", location:"Brent Cross", price:65, spaces:5, img:"images/cooking.jpg",
-          desc:"Measure, mix, and bake simple recipes safely. Learn kitchen rules and make a snack each week." },
-        { id:8, subject:"Drama & Acting", location:"Hendon", price:85, spaces:5, img:"images/drama.jpg",
-          desc:"Improv games, voice projection, and short scenes. Build confidence and perform mini-skits." },
-        { id:9, subject:"Science Experiments", location:"Colindale", price:95, spaces:5, img:"images/science.jpg",
-          desc:"Safe, hands-on experiments: slime, rockets, circuits, and physics demos that explain how things work." },
-        { id:10, subject:"Art of Comics", location:"Hendon", price:70, spaces:5, img:"images/comic.jpg",
-          desc:"Create characters, storyboards, and panels. Learn inking and speech bubbles for your own mini-comic." },
-        { id:11, subject:"Nature Explorers", location:"Brent Cross", price:55, spaces:5, img:"images/nature.jpg",
-          desc:"Outdoor discovery: plant and bug ID, mini-terrariums, compass skills, and eco-friendly crafts." },
-        { id:12, subject:"Board Games Club", location:"Colindale", price:50, spaces:5, img:"images/boardgame.jpg",
-          desc:"Strategy and co-op games, friendly tournaments, and design a simple board game with friends." }
-      ]
+      // Lessons come from the backend now
+      // each lesson will be shaped as:
+      // { id, subject, location, price, spaces, maxSpaces, img, desc }
+      lessons: []
     };
   },
 
@@ -203,8 +181,88 @@ export default {
   },
 
   methods: {
+
+    /* ---------- backend checkout helper ---------- */
+async sendOrdersToBackend() {
+  try {
+    for (var i = 0; i < this.cart.length; i = i + 1) {
+      var item = this.cart[i];
+      var lesson = this.getLessonById(item.id);
+      if (!lesson) continue;
+
+      // 1) Create the order
+      var orderBody = {
+        name: this.customer.name || "Customer",
+        phoneNumber: this.customer.phone,
+        lessonId: lesson.id, 
+        numberOfSpaces: item.qty
+      };
+
+      var orderRes = await fetch(`${API_BASE_URL}/api/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderBody)
+      });
+
+      if (!orderRes.ok) {
+        throw new Error("Order failed for " + lesson.subject);
+      }
+
+      // 2) Update the backend lesson space
+      var putBody = { space: lesson.spaces };
+
+      var putRes = await fetch(`${API_BASE_URL}/api/lessons/${lesson.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(putBody)
+      });
+
+      if (!putRes.ok) {
+        throw new Error("Failed to update spaces for " + lesson.subject);
+      }
+    }
+  } catch (err) {
+    console.error("Error talking to API during checkout:", err);
+    throw err;
+  }
+},
+
+
+    /* ---------- API ---------- */
+    async fetchLessons() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/lessons`);
+        if (!response.ok) {
+          throw new Error('Failed to load lessons');
+        }
+        const data = await response.json();
+
+        // Map backend fields -> frontend shape
+        this.lessons = data.map(function (l) {
+          return {
+            id: l._id,                      // MongoDB id
+            subject: l.title,               // backend: title
+            location: l.location,
+            price: l.price,
+            spaces: l.space,                // backend: space
+            maxSpaces: l.space,             // remember original capacity
+            img: 'images/' + (l.image || 'placeholder.jpg'),
+            desc: l.description || ''
+          };
+        });
+
+        // After loading lessons we can re-apply cart reductions
+        if (this.cart.length > 0) {
+          this.applyCartToLessons();
+        }
+        this.sortLessons();
+      } catch (err) {
+        console.error('Error fetching lessons:', err);
+        alert('Could not load lessons from the server.');
+      }
+    },
+
     /* ---------- persistence ---------- */
-    // I save cart and toolbar prefs so they survive page refresh.
     saveCart: function () {
       try {
         localStorage.setItem('asa_cart', JSON.stringify(this.cart));
@@ -228,8 +286,10 @@ export default {
     // When I restore the cart, I rebuild lesson spaces from it.
     applyCartToLessons: function () {
       var i;
+      // reset to original capacity from backend
       for (i = 0; i < this.lessons.length; i = i + 1) {
-        this.lessons[i].spaces = 5;
+        var l = this.lessons[i];
+        l.spaces = typeof l.maxSpaces === 'number' ? l.maxSpaces : l.spaces;
       }
       for (i = 0; i < this.cart.length; i = i + 1) {
         var item = this.cart[i];
@@ -256,7 +316,6 @@ export default {
     },
 
     /* ---------- sorting ---------- */
-    // I sort the list in-place based on the selected option.
     sortLessons: function () {
       if (this.selectedSort == "price") {
         this.lessons.sort(function (a, b) { return a.price - b.price; });
@@ -269,7 +328,12 @@ export default {
           if (A < B) return -1; if (A > B) return 1; return 0;
         });
       } else {
-        this.lessons.sort(function (a, b) { return a.id - b.id; });
+        // default sort by id from backend
+        this.lessons.sort(function (a, b) {
+          if (a.id < b.id) return -1;
+          if (a.id > b.id) return 1;
+          return 0;
+        });
       }
     },
     onSortChange: function () {
@@ -318,7 +382,6 @@ export default {
     },
 
     /* ---------- cart mutations ---------- */
-    // Add one to cart and reduce available spaces.
     book: function (lesson) {
       if (lesson.spaces === 0) {
         return;
@@ -367,9 +430,9 @@ export default {
       this.saveCart();
     },
 
+    /* ---------- checkout (currently still local) ---------- */
     /* ---------- checkout ---------- */
-    // I validate email + phone here (simple, user-friendly regexes).
-    checkout: function () {
+    checkout: async function () {
       var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((this.customerEmail || "").trim());
       var phoneOk = /^[+]?[\d\s().-]{7,20}$/.test((this.customer.phone || "").trim());
 
@@ -382,15 +445,30 @@ export default {
         return;
       }
 
-      alert("Order submitted! Thank you.\nEmail: " + this.customerEmail + "\nPhone: " + this.customer.phone);
+      try {
+        // Send orders + update spaces in MongoDB
+        await this.sendOrdersToBackend();
 
-      // Reset UI and storage
-      this.cart = [];
-      this.customerEmail = "";
-      this.customer.phone = "";
-      this.showCart = false;
-      this.saveCart();
+        alert(
+          "Order submitted to the server! Thank you.\n" +
+          "Email: " + this.customerEmail + "\n" +
+          "Phone: " + this.customer.phone
+        );
+
+        // Reset UI and storage
+        this.cart = [];
+        this.customerEmail = "";
+        this.customer.phone = "";
+        this.showCart = false;
+        this.saveCart();
+
+        // Refresh lessons from backend to sync new space values
+        await this.fetchLessons();
+      } catch (err) {
+        alert("Something went wrong while saving your order. Please try again.");
+      }
     },
+
 
     // Scroll to top and show lessons
     goHome: function () {
@@ -400,8 +478,8 @@ export default {
     }
   },
 
-  mounted: function () {
-    // On load I restore state and rebuild spaces from the cart.
+  mounted: async function () {
+    // Restore local UI state
     try {
       var savedCart   = localStorage.getItem("asa_cart");
       var savedSort   = localStorage.getItem("asa_sort");
@@ -410,12 +488,12 @@ export default {
       if (savedCart)   { this.cart = JSON.parse(savedCart); }
       if (savedSort)   { this.selectedSort = savedSort; }
       if (savedSearch) { this.searchText = savedSearch; }
-
-      if (this.cart.length > 0) { this.applyCartToLessons(); }
-      this.sortLessons();
     } catch (e) {
       console.warn("Could not load saved state:", e);
     }
+
+    // Load lessons from backend, then apply cart + sort
+    await this.fetchLessons();
 
     this.play();
   }
