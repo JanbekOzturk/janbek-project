@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 
 /**
  * GET /api/lessons/:id
- * (Optional but handy) Get a single lesson by id.
+ * Get a single lesson by id.
  */
 router.get('/:id', async (req, res) => {
   try {
@@ -62,7 +62,7 @@ router.put('/:id', async (req, res) => {
 
     const result = await col.updateOne(
       { _id: new ObjectId(req.params.id) },
-      { $set: { space: Number(space) } }
+      { $set: { space: Number(space) } } // here we update the space available.
     );
 
     if (result.matchedCount === 0) {
