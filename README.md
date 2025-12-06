@@ -7,9 +7,14 @@ Author: Janbek
 Necessary links;
 
 Vue.js Github Repository; https://github.com/JanbekOzturk/janbek-project
+
+
 GitHub Pages Link; https://janbekozturk.github.io/janbek-project/
 
+
 Express.js GitHub Repository; https://github.com/JanbekOzturk/janbek-project/tree/main/server
+
+
 Render API Link; https://janbek-project-api.onrender.com
 
 
